@@ -2,14 +2,22 @@
 {% block title %}{{ beer.name }}{% endblock %}
 {% block content %}
 <div class="beer-head">
-  <div>
-    <h1>{{ beer.name }}</h1>
-    <p class="muted">
-      <a href="{{ beer.brewery.get_absolute_url }}">{{ beer.brewery.name }}</a>
-      {% if beer.style %} · <a href="{% url 'tastings:beer_list' %}?style={{ beer.style|urlencode }}">{{ beer.style }}</a>{% endif %}
-      {% if beer.abv is not None %} · {{ beer.abv }} % vol.{% endif %}
-      {% if beer.ibu is not None %} · {{ beer.ibu }} IBU{% endif %}
-    </p>
+  <div class="beer-info">
+    <div>
+      <h1>{{ beer.name }}</h1>
+      <p class="muted">
+        <a href="{{ beer.brewery.get_absolute_url }}">{{ beer.brewery.name }}</a>
+        {% if beer.style %} · <a href="{% url 'tastings:beer_list' %}?style={{ beer.style|urlencode }}">{{ beer.style }}</a>{% endif %}
+        {% if beer.abv is not None %} · {{ beer.abv }} % vol.{% endif %}
+        {% if beer.ibu is not None %} · {{ beer.ibu }} IBU{% endif %}
+      </p>
+    </div>
+    {# QR code : ouvre la fiche de dégustation pré-remplie pour cette bière #}
+    <a class="beer-qr" href="{% url 'tastings:beer_qrcode' beer.pk %}?download=1"
+       title="Télécharger le QR code (SVG) pour l'imprimer">
+      <img src="{% url 'tastings:beer_qrcode' beer.pk %}" alt="QR code pour noter {{ beer.name }}" width="110" height="110">
+      <span>Scannez pour noter</span>
+    </a>
   </div>
   <div class="score">
     {% if beer.avg_rating is not None %}
@@ -20,7 +28,6 @@
 </div>
 <div class="actions">
   <a class="btn btn-primary" href="{% url 'tastings:tasting_create' %}?beer={{ beer.pk }}">Déguster cette bière</a>
-  <a class="btn" href="{% url 'tastings:beer_labels' beer.pk %}">QR code à imprimer</a>
 </div>
 
 <h2>Toutes les dégustations</h2>

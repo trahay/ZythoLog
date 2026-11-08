@@ -191,7 +191,7 @@ class QrCodeTests(TestCase):
             "beer_name": "Ma Saison", "brewery_name": "Ma Brasserie", "style": "Saison",
             "abv": "6.5", "ibu": "28"})
         beer = Beer.objects.get()
-        self.assertRedirects(r, reverse("tastings:beer_labels", args=[beer.pk]))
+        self.assertRedirects(r, beer.get_absolute_url())
         self.client.logout()
         return beer
 
@@ -200,15 +200,16 @@ class QrCodeTests(TestCase):
         self.assertEqual(r.status_code, 302)
         self.assertIn(reverse("login"), r["Location"])
 
-    def test_qrcode_and_labels(self):
+    def test_qrcode_on_beer_page(self):
         beer = self.create_beer()
-        r = self.client.get(reverse("tastings:beer_qrcode", args=[beer.pk]))
+        r = self.client.get(beer.get_absolute_url())
+        qr_url = reverse("tastings:beer_qrcode", args=[beer.pk])
+        self.assertContains(r, f'<img src="{qr_url}"')
+        r = self.client.get(qr_url)
         self.assertEqual(r["Content-Type"], "image/svg+xml")
         self.assertTrue(r.content.lstrip().startswith(b"<svg"))
-        r = self.client.get(reverse("tastings:beer_labels", args=[beer.pk]), {"n": "100"})
-        self.assertEqual(r.context["count"], 24)
-        self.assertEqual(r.context["scan_url"], "http://testserver/b/%d/" % beer.pk)
-        self.assertContains(r, "Notez cette bière", count=24)
+        r = self.client.get(qr_url, {"download": "1"})
+        self.assertIn("attachment", r["Content-Disposition"])
 
     def test_scan_prefills_and_locks_beer(self):
         beer = self.create_beer()

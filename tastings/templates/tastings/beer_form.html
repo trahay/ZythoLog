@@ -3,11 +3,11 @@
 {% block content %}
 <div class="narrow">
 <h1>Ajouter une bière</h1>
-<p class="muted">Pour une bière que vous vendez : une fois enregistrée, vous pourrez imprimer son QR code.
+<p class="muted">Pour une bière que vous vendez : une fois enregistrée, sa page affiche son QR code.
   En le scannant, vos clients arrivent sur une fiche de dégustation déjà remplie avec ces informations.</p>
 <form method="post">{% csrf_token %}
   {% for field in form %}{% include "tastings/_field.html" %}{% endfor %}
-  <button class="btn btn-primary" type="submit">Enregistrer et créer le QR code</button>
+  <button class="btn btn-primary" type="submit">Enregistrer</button>
 </form>
 </div>
 {% endblock %}

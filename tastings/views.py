@@ -183,15 +183,15 @@ def signup(request):
     return render(request, "registration/signup.html", {"form": form})
 
 
-# --- Bières vendues : ajout d'une bière et QR code à imprimer ---------------
+# --- Bières vendues : ajout d'une bière et QR code ---------------------------
 
 @login_required
 def beer_create(request):
     form = BeerForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         beer = form.save()
-        messages.success(request, f"« {beer.name} » est enregistrée. Voici son QR code à imprimer.")
-        return redirect("tastings:beer_labels", pk=beer.pk)
+        messages.success(request, f"« {beer.name} » est enregistrée. Son QR code est affiché ci-dessous.")
+        return redirect(beer)
     return render(request, "tastings/beer_form.html", {"form": form})
 
 
@@ -214,15 +214,3 @@ def beer_qrcode(request, pk):
         response["Content-Disposition"] = f'attachment; filename="zytholog-{beer.pk}.svg"'
     return response
 
-
-def beer_labels(request, pk):
-    """Planche d'étiquettes à imprimer et découper."""
-    beer = get_object_or_404(Beer.objects.select_related("brewery"), pk=pk)
-    try:
-        count = min(max(int(request.GET.get("n", 6)), 1), 24)
-    except ValueError:
-        count = 6
-    return render(request, "tastings/beer_labels.html", {
-        "beer": beer, "count": count, "labels": range(count),
-        "scan_url": beer_scan_url(request, beer),
-    })

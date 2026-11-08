@@ -10,7 +10,6 @@ urlpatterns = [
     path("bieres/nouvelle/", views.beer_create, name="beer_create"),
     path("bieres/<int:pk>/", views.beer_detail, name="beer_detail"),
     path("bieres/<int:pk>/qrcode.svg", views.beer_qrcode, name="beer_qrcode"),
-    path("bieres/<int:pk>/etiquettes/", views.beer_labels, name="beer_labels"),
     path("b/<int:pk>/", views.beer_scan, name="beer_scan"),
     path("brasseries/<int:pk>/", views.brewery_detail, name="brewery_detail"),
     path("degustations/nouvelle/", views.tasting_create, name="tasting_create"),

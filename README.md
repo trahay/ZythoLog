@@ -26,9 +26,9 @@ Puis ouvrir http://localhost:8000. Tests : `.venv/bin/python manage.py test tast
 ## QR codes pour les bières vendues
 
 - « + Ajouter une bière que je vends » (page Bières, compte requis) enregistre une
-  bière sans dégustation et mène à sa planche d'étiquettes à imprimer.
-- Chaque bière a un QR code (bouton « QR code à imprimer » sur sa page, ou
-  `/bieres/<n°>/etiquettes/`), qui pointe vers l'adresse courte `/b/<n°>/`.
+  bière sans dégustation.
+- La page de chaque bière affiche son QR code ; un clic dessus le télécharge en
+  SVG pour l'imprimer. Il pointe vers l'adresse courte `/b/<n°>/`.
 - En le scannant, le client ouvre une fiche de dégustation où la bière (nom,
   brasserie, style, alcool, amertume) est déjà renseignée et non modifiable.
 
