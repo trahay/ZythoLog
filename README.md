@@ -60,6 +60,20 @@ Sauvegarde de la base :
 docker compose exec postgres pg_dump -U zytholog zytholog > zytholog.sql
 ```
 
+### Connexion avec Google (facultatif)
+
+1. Dans la [console Google Cloud](https://console.cloud.google.com/apis/credentials),
+   configurer l'écran de consentement OAuth (type « Externe »), puis créer un
+   identifiant « ID client OAuth » de type « Application Web ».
+2. URI de redirection autorisé :
+   `https://trahay.nohost.me/zytholog/accounts/google/login/callback/`
+3. Reporter l'ID client et le code secret dans `.env` (`GOOGLE_CLIENT_ID`,
+   `GOOGLE_CLIENT_SECRET`), puis `docker compose up -d`.
+
+Sans ces deux variables, le bouton « Se connecter avec Google » n'apparaît pas.
+Une connexion Google crée un compte ZythoLog au premier passage et y rattache
+les dégustations faites sans compte depuis le même navigateur.
+
 ### Côté YunoHost
 
 Installer l'appli « Redirect » sur `trahay.nohost.me/zytholog`, en mode

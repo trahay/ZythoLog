@@ -1,0 +1,4 @@
+{% extends "tastings/base.html" %}
+{# Les pages de django-allauth (erreur ou annulation Google…) reprennent le style du site : #}
+{# elles remplissent les blocs head_title et content. #}
+{% block title %}{% block head_title %}{% endblock head_title %}{% endblock title %}

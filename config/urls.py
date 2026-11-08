@@ -6,6 +6,8 @@ from django.urls import include, path
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("compte/", include("django.contrib.auth.urls")),
+    # Connexion via Google (django-allauth)
+    path("accounts/", include("allauth.urls")),
     path("", include("tastings.urls")),
 ]
 

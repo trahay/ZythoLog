@@ -128,3 +128,53 @@ class TastingTests(TestCase):
         self.assertEqual(t.photos.count(), 0)
         self.client.post(reverse("tastings:tasting_delete", args=[t.pk]))
         self.assertFalse(Tasting.objects.exists())
+
+
+GOOGLE_PROVIDERS = {
+    "google": {
+        "SCOPE": ["profile", "email"],
+        "APPS": [{"client_id": "test-client-id", "secret": "test-secret", "key": ""}],
+    }
+}
+
+
+class GoogleLoginTests(TestCase):
+    def test_no_google_button_without_credentials(self):
+        with override_settings(SOCIALACCOUNT_PROVIDERS={"google": {"APPS": []}}):
+            self.assertNotContains(self.client.get(reverse("login")), "Se connecter avec Google")
+
+    @override_settings(SOCIALACCOUNT_PROVIDERS=GOOGLE_PROVIDERS)
+    def test_google_signup_claims_anonymous_tastings(self):
+        from unittest import mock
+        from urllib.parse import parse_qs, urlparse
+
+        from allauth.socialaccount.models import SocialAccount
+
+        # Dégustation faite sans compte
+        self.client.post(reverse("tastings:tasting_create"), payload())
+        self.assertContains(self.client.get(reverse("login")), "Se connecter avec Google")
+        self.assertContains(self.client.get(reverse("tastings:signup")), "inscrire avec Google")
+
+        # Le bouton envoie vers Google avec la bonne URL de retour
+        r = self.client.post(reverse("google_login"), {"process": "login"})
+        self.assertEqual(r.status_code, 302)
+        url = urlparse(r["Location"])
+        self.assertEqual(url.netloc, "accounts.google.com")
+        params = parse_qs(url.query)
+        self.assertEqual(params["client_id"], ["test-client-id"])
+        self.assertTrue(params["redirect_uri"][0].endswith("/accounts/google/login/callback/"))
+
+        # Retour de Google (échanges avec Google simulés)
+        user_info = {"id": "1234567890", "email": "bob@gmail.com", "verified_email": True,
+                     "name": "Bob Brasseur", "given_name": "Bob", "family_name": "Brasseur"}
+        with mock.patch("allauth.socialaccount.providers.oauth2.client.OAuth2Client.get_access_token",
+                        return_value={"access_token": "tok", "expires_in": 3600}), \
+             mock.patch("allauth.socialaccount.providers.google.views.GoogleOAuth2Adapter._fetch_user_info",
+                        return_value=user_info):
+            r = self.client.get(reverse("google_callback"),
+                                {"code": "abc", "state": params["state"][0]})
+        self.assertRedirects(r, reverse("tastings:my_tastings"), fetch_redirect_response=False)
+
+        account = SocialAccount.objects.get(provider="google", uid="1234567890")
+        self.assertEqual(account.user.email, "bob@gmail.com")
+        self.assertEqual(Tasting.objects.get().user, account.user)

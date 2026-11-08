@@ -9,5 +9,6 @@
   {% for field in form %}{% include "tastings/_field.html" %}{% endfor %}
   <button class="btn btn-primary" type="submit">Créer mon compte</button>
 </form>
+{% include "tastings/_social_login.html" with label="S'inscrire avec Google" %}
 </div>
 {% endblock %}

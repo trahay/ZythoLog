@@ -54,6 +54,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'tastings',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 ]
 
 MIDDLEWARE = [
@@ -64,6 +68,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -159,3 +164,35 @@ MEDIA_ROOT = Path(os.environ.get('DJANGO_MEDIA_ROOT', BASE_DIR / 'media'))
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'tastings:my_tastings'
 LOGOUT_REDIRECT_URL = 'tastings:home'
+
+# --- Authentification : comptes locaux + connexion Google (django-allauth) ---
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+# Pas de serveur de mail : on ne vérifie pas les adresses e-mail
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_LOGIN_METHODS = {'username'}
+ACCOUNT_SIGNUP_FIELDS = ['username*', 'email', 'password1*', 'password2*']
+# Premier passage par Google : le compte est créé sans formulaire supplémentaire
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_EMAIL_REQUIRED = False
+# Les e-mails des comptes locaux ne sont pas vérifiés : on ne rattache jamais
+# automatiquement une connexion Google à un compte local de même e-mail.
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = False
+SOCIALACCOUNT_STORE_TOKENS = False
+
+# Identifiants OAuth Google (console Google Cloud). Sans eux, le bouton
+# « Se connecter avec Google » n'est pas affiché.
+GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '')
+GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET', '')
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {'access_type': 'online', 'prompt': 'select_account'},
+        'APPS': [
+            {'client_id': GOOGLE_CLIENT_ID, 'secret': GOOGLE_CLIENT_SECRET, 'key': ''}
+        ] if GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET else [],
+    }
+}

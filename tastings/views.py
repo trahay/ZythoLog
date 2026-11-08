@@ -170,7 +170,8 @@ def signup(request):
         form = SignUpForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)  # déclenche le rattachement des dégustations anonymes
+            # déclenche le rattachement des dégustations anonymes
+            login(request, user, backend="django.contrib.auth.backends.ModelBackend")
             messages.success(request, f"Bienvenue {user.username} !")
             return redirect("tastings:my_tastings")
     else:
