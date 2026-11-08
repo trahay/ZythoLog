@@ -54,6 +54,27 @@ class ColorScaleInput(forms.Widget):
         return ctx
 
 
+class ScaleInput(forms.Widget):
+    """Curseur sur 5 points le long d'un dégradé, non renseigné tant qu'on n'y touche pas."""
+    template_name = "tastings/widgets/scale.html"
+
+    def __init__(self, choices, ticks, gradient, attrs=None):
+        self.scale_choices, self.ticks, self.gradient = list(choices), ticks, gradient
+        super().__init__(attrs)
+
+    def get_context(self, name, value, attrs):
+        ctx = super().get_context(name, value, attrs)
+        labels = dict(self.scale_choices)
+        value = int(value) if value not in (None, "") else None
+        keys = [k for k, _ in self.scale_choices]
+        ctx["widget"].update(
+            value=value, min=min(keys), max=max(keys), mid=keys[len(keys) // 2],
+            gradient=self.gradient, ticks=self.ticks, labels=labels,
+            label=labels.get(value, ""),
+        )
+        return ctx
+
+
 INTENSITY_FIELDS = [
     "aroma_intensity", "aroma_malt", "aroma_hop", "aroma_yeast",
     "flavor_intensity", "flavor_malt", "flavor_hop", "bitterness", "sweetness",
@@ -129,7 +150,8 @@ class TastingForm(forms.ModelForm, BeerFieldsForm):
             "date": forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
             "rating": forms.NumberInput(attrs={"min": 0, "max": 10, "step": 0.5}),
             "color_ebc": ColorScaleInput,
-            "head_retention": forms.RadioSelect,
+            "clarity": ScaleInput(c.CLARITY, c.CLARITY_TICKS, c.CLARITY_GRADIENT),
+            "head_retention": ScaleInput(c.HEAD_RETENTION, c.HEAD_RETENTION_TICKS, c.HEAD_RETENTION_GRADIENT),
             "body": forms.RadioSelect,
             "carbonation": forms.RadioSelect,
             "finish": forms.RadioSelect,
@@ -149,7 +171,7 @@ class TastingForm(forms.ModelForm, BeerFieldsForm):
             self.fields[name].widget = RangeInput(dict(c.INTENSITY))
             self.fields[name].required = False  # 0 par défaut (voir clean)
         # Les RadioSelect générés par Django ajoutent un choix vide « --------- »
-        for name in ["head_retention", "body", "carbonation", "finish"]:
+        for name in ["body", "carbonation", "finish"]:
             self.fields[name].choices = [ch for ch in self.fields[name].choices if ch[0] != ""]
         # Un utilisateur connecté signe avec son compte : pas besoin de pseudo
         if user is not None and user.is_authenticated:

@@ -1,0 +1,29 @@
+<div class="color-scale{% if widget.value is None %} unset{% endif %}">
+  <input type="hidden" name="{{ widget.name }}" value="{{ widget.value|default_if_none:'' }}">
+  <input type="range" id="{{ widget.attrs.id }}" min="{{ widget.min }}" max="{{ widget.max }}" step="1"
+         value="{{ widget.value|default:widget.mid }}" style="background: {{ widget.gradient }}">
+  <div class="scale-ticks">{% for t in widget.ticks %}<span>{{ t }}</span>{% endfor %}</div>
+  <div class="color-scale-info">
+    <output>{% if widget.label %}{{ widget.label }} · {{ widget.value }}/{{ widget.max }}{% else %}Non renseignée — faites glisser le curseur{% endif %}</output>
+    <button type="button" class="link color-clear">effacer</button>
+  </div>
+  {{ widget.labels|json_script }}
+</div>
+<script>
+(function () {
+  const box = document.currentScript.previousElementSibling;
+  const [hidden, range] = box.querySelectorAll("input");
+  const out = box.querySelector("output");
+  const labels = JSON.parse(box.querySelector("script[type='application/json']").textContent);
+  range.addEventListener("input", () => {
+    hidden.value = range.value;
+    box.classList.remove("unset");
+    out.textContent = labels[range.value] + " · " + range.value + "/" + range.max;
+  });
+  box.querySelector(".color-clear").addEventListener("click", () => {
+    hidden.value = "";
+    box.classList.add("unset");
+    out.textContent = "Non renseignée — faites glisser le curseur";
+  });
+})();
+</script>

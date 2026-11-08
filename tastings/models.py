@@ -86,7 +86,7 @@ class Tasting(models.Model):
         "couleur (EBC)", null=True, blank=True,
         validators=[MinValueValidator(c.EBC_MIN), MaxValueValidator(c.EBC_MAX)],
     )
-    clarity = models.CharField("transparence", max_length=20, choices=c.CLARITY, blank=True)
+    clarity = models.PositiveSmallIntegerField("transparence", choices=c.CLARITY, null=True, blank=True)
     head_color = models.CharField("couleur de la mousse", max_length=20, choices=c.HEAD_COLOR, blank=True)
     head_texture = models.CharField("texture de la mousse", max_length=20, choices=c.HEAD_TEXTURE, blank=True)
     head_retention = models.PositiveSmallIntegerField(

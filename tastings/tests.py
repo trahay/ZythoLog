@@ -22,7 +22,7 @@ def png(name="biere.png"):
 def payload(**extra):
     data = {
         "beer_name": "Punk IPA", "brewery_name": "BrewDog", "style": "IPA américaine", "abv": "5.4",
-        "date": "2026-11-01", "color_ebc": "12", "clarity": "limpide", "head_retention": "3",
+        "date": "2026-11-01", "color_ebc": "12", "clarity": "2", "head_retention": "3",
         "aroma_intensity": "4", "aroma_malt": "1", "aroma_hop": "5", "aroma_yeast": "1",
         "aroma_descriptors": ["agrumes", "tropical"],
         "flavor_intensity": "4", "flavor_malt": "2", "flavor_hop": "4", "bitterness": "4",

@@ -67,13 +67,19 @@ def ebc_gradient():
     return f"linear-gradient(to right, {SRM_HEX[0]} 0%, {', '.join(stops)}, {SRM_HEX[-1]} 100%)"
 
 
+# Transparence sur 5 points : claire → voilée → opaque
 CLARITY = [
-    ("brillante", "Brillante"),
-    ("limpide", "Limpide"),
-    ("voilee", "Légèrement voilée"),
-    ("trouble", "Trouble"),
-    ("opaque", "Opaque"),
+    (1, "Claire"),
+    (2, "Légèrement voilée"),
+    (3, "Voilée"),
+    (4, "Très voilée"),
+    (5, "Opaque"),
 ]
+# Repères affichés sous le curseur
+CLARITY_TICKS = ["Claire", "Voilée", "Opaque"]
+# Dégradé du curseur : une bière dorée de plus en plus trouble
+CLARITY_GRADIENT = ("linear-gradient(to right, #fff4c2 0%, #f3dc8e 25%, "
+                    "#dcc58f 50%, #b9a98d 75%, #8a8172 100%)")
 
 HEAD_COLOR = [
     ("blanche", "Blanche"),
@@ -88,13 +94,17 @@ HEAD_TEXTURE = [
     ("grossiere", "Grossière / bulles larges"),
 ]
 
+# Ténacité de la mousse sur 5 points : pauvre → bonne → persistante
 HEAD_RETENTION = [
-    (0, "Nulle"),
-    (1, "Faible"),
+    (1, "Pauvre"),
     (2, "Moyenne"),
     (3, "Bonne"),
-    (4, "Excellente"),
+    (4, "Très bonne"),
+    (5, "Persistante"),
 ]
+HEAD_RETENTION_TICKS = ["Pauvre", "Bonne", "Persistante"]
+# Dégradé du curseur : de quelques bulles à une mousse dense
+HEAD_RETENTION_GRADIENT = ("linear-gradient(to right, #d9a93f 0%, #ead6a0 50%, #fffdf6 100%)")
 
 # --- Toucher ---------------------------------------------------------------
 BODY = [

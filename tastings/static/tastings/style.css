@@ -103,6 +103,7 @@ details { margin: 10px 0; } summary { cursor: pointer; font-weight: 600; }
 .color-scale-info { display: flex; align-items: center; gap: 10px; margin-top: 6px; font-size: .92em; }
 .color-chip { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--border); flex: none; }
 .color-scale.unset .color-clear { display: none; }
+.scale-ticks { display: flex; justify-content: space-between; color: var(--muted); font-size: .8em; margin-top: 2px; }
 .separator { display: flex; align-items: center; gap: 10px; color: var(--muted); margin: 20px 0 12px; font-size: .9em; }
 .separator::before, .separator::after { content: ""; flex: 1; border-top: 1px solid var(--border); }
 .btn-google { display: inline-flex; align-items: center; gap: 10px; width: 100%; justify-content: center; font-weight: 600; }
