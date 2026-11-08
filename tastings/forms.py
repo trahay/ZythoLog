@@ -76,7 +76,7 @@ class ScaleInput(forms.Widget):
 
 
 INTENSITY_FIELDS = [
-    "aroma_intensity", "aroma_malt", "aroma_hop", "aroma_yeast",
+    "aroma_intensity",
     "flavor_intensity", "flavor_malt", "flavor_hop", "bitterness", "sweetness",
     "acidity", "alcohol_warmth", "astringency",
 ]

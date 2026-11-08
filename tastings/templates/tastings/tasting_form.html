@@ -59,12 +59,7 @@
 
   <fieldset>
     <legend>👃 Arômes</legend>
-    <div class="cols">
-      {% include "tastings/_field.html" with field=form.aroma_intensity %}
-      {% include "tastings/_field.html" with field=form.aroma_malt %}
-      {% include "tastings/_field.html" with field=form.aroma_hop %}
-      {% include "tastings/_field.html" with field=form.aroma_yeast %}
-    </div>
+    {% include "tastings/_field.html" with field=form.aroma_intensity %}
     <details{% if form.aroma_descriptors.value %} open{% endif %}><summary>Descripteurs d'arômes</summary>
       <div class="descriptors">{{ form.aroma_descriptors }}</div>
     </details>

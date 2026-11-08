@@ -96,9 +96,6 @@ class Tasting(models.Model):
 
     # Odorat
     aroma_intensity = intensity("intensité aromatique")
-    aroma_malt = intensity("arômes de malt")
-    aroma_hop = intensity("arômes de houblon")
-    aroma_yeast = intensity("arômes de levure / fermentation")
     aroma_descriptors = models.JSONField("descripteurs d'arômes", default=list, blank=True)
     aroma_notes = models.TextField("remarques sur les arômes", blank=True)
 
@@ -169,9 +166,6 @@ class Tasting(models.Model):
     def aroma_profile(self):
         return [
             ("Intensité", self.aroma_intensity),
-            ("Malt", self.aroma_malt),
-            ("Houblon", self.aroma_hop),
-            ("Levure", self.aroma_yeast),
         ]
 
     def flavor_profile(self):
