@@ -95,7 +95,12 @@ class Tasting(models.Model):
     appearance_notes = models.TextField("remarques sur l'apparence", blank=True)
 
     # Odorat
-    aroma_intensity = intensity("intensité aromatique")
+    aroma_intensity = models.PositiveSmallIntegerField(
+        "intensité aromatique", choices=c.AROMA_INTENSITY, null=True, blank=True
+    )
+    aroma_impression = models.PositiveSmallIntegerField(
+        "impression", choices=c.AROMA_IMPRESSION, null=True, blank=True
+    )
     aroma_descriptors = models.JSONField("descripteurs d'arômes", default=list, blank=True)
     aroma_notes = models.TextField("remarques sur les arômes", blank=True)
 
@@ -165,7 +170,10 @@ class Tasting(models.Model):
 
     def aroma_profile(self):
         return [
-            ("Intensité", self.aroma_intensity),
+            (label, value) for label, value in [
+                ("Intensité", self.aroma_intensity),
+                ("Impression", self.aroma_impression),
+            ] if value is not None
         ]
 
     def flavor_profile(self):

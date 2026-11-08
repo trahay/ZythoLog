@@ -76,7 +76,6 @@ class ScaleInput(forms.Widget):
 
 
 INTENSITY_FIELDS = [
-    "aroma_intensity",
     "flavor_intensity", "flavor_malt", "flavor_hop", "bitterness", "sweetness",
     "acidity", "alcohol_warmth", "astringency",
 ]
@@ -150,6 +149,8 @@ class TastingForm(forms.ModelForm, BeerFieldsForm):
             "date": forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
             "rating": forms.NumberInput(attrs={"min": 0, "max": 10, "step": 0.5}),
             "color_ebc": ColorScaleInput,
+            "aroma_intensity": ScaleInput(c.AROMA_INTENSITY, c.AROMA_INTENSITY_TICKS, c.AROMA_INTENSITY_GRADIENT),
+            "aroma_impression": ScaleInput(c.AROMA_IMPRESSION, c.AROMA_IMPRESSION_TICKS, c.AROMA_IMPRESSION_GRADIENT),
             "clarity": ScaleInput(c.CLARITY, c.CLARITY_TICKS, c.CLARITY_GRADIENT),
             "head_retention": ScaleInput(c.HEAD_RETENTION, c.HEAD_RETENTION_TICKS, c.HEAD_RETENTION_GRADIENT),
             "body": forms.RadioSelect,

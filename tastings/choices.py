@@ -14,6 +14,27 @@ INTENSITY = [
     (5, "5 – très fort"),
 ]
 
+# Arômes : intensité et impression sur 5 points (curseurs)
+AROMA_INTENSITY = [
+    (1, "Faible"),
+    (2, "Plutôt faible"),
+    (3, "Moyenne"),
+    (4, "Plutôt forte"),
+    (5, "Forte"),
+]
+AROMA_INTENSITY_TICKS = ["Faible", "Moyenne", "Forte"]
+AROMA_INTENSITY_GRADIENT = "linear-gradient(to right, #fbf1d3 0%, #f0c46a 50%, #c4661f 100%)"
+
+AROMA_IMPRESSION = [
+    (1, "Déplaisante"),
+    (2, "Plutôt déplaisante"),
+    (3, "Neutre"),
+    (4, "Plutôt plaisante"),
+    (5, "Plaisante"),
+]
+AROMA_IMPRESSION_TICKS = ["Déplaisante", "Neutre", "Plaisante"]
+AROMA_IMPRESSION_GRADIENT = "linear-gradient(to right, #d9695f 0%, #e6e0d2 50%, #6fb36b 100%)"
+
 SERVING = [
     ("bouteille", "Bouteille"),
     ("canette", "Canette"),
