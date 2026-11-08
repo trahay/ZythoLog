@@ -96,21 +96,21 @@ class Tasting(models.Model):
 
     # Odorat
     aroma_intensity = models.PositiveSmallIntegerField(
-        "intensité aromatique", choices=c.AROMA_INTENSITY, null=True, blank=True
+        "intensité aromatique", choices=c.SCALE_INTENSITY, null=True, blank=True
     )
     aroma_impression = models.PositiveSmallIntegerField(
-        "impression", choices=c.AROMA_IMPRESSION, null=True, blank=True
+        "impression", choices=c.SCALE_IMPRESSION, null=True, blank=True
     )
     aroma_descriptors = models.JSONField("descripteurs d'arômes", default=list, blank=True)
     aroma_notes = models.TextField("remarques sur les arômes", blank=True)
 
     # Goût
-    flavor_intensity = intensity("intensité des saveurs")
-    flavor_malt = intensity("saveur de malt")
-    flavor_hop = intensity("saveur de houblon")
-    bitterness = intensity("amertume")
-    sweetness = intensity("sucré")
-    acidity = intensity("acidité")
+    flavor_intensity = models.PositiveSmallIntegerField(
+        "intensité des saveurs", choices=c.SCALE_INTENSITY, null=True, blank=True
+    )
+    flavor_impression = models.PositiveSmallIntegerField(
+        "impression", choices=c.SCALE_IMPRESSION, null=True, blank=True
+    )
     finish = models.CharField("longueur en bouche", max_length=10, choices=c.FINISH, blank=True)
     flavor_descriptors = models.JSONField("descripteurs de saveurs", default=list, blank=True)
     flavor_notes = models.TextField("remarques sur les saveurs", blank=True)
@@ -178,12 +178,10 @@ class Tasting(models.Model):
 
     def flavor_profile(self):
         return [
-            ("Intensité", self.flavor_intensity),
-            ("Malt", self.flavor_malt),
-            ("Houblon", self.flavor_hop),
-            ("Amertume", self.bitterness),
-            ("Sucré", self.sweetness),
-            ("Acidité", self.acidity),
+            (label, value) for label, value in [
+                ("Intensité", self.flavor_intensity),
+                ("Impression", self.flavor_impression),
+            ] if value is not None
         ]
 
 

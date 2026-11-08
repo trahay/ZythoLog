@@ -69,14 +69,8 @@
 
   <fieldset>
     <legend>👅 Saveurs</legend>
-    <div class="cols">
-      {% include "tastings/_field.html" with field=form.flavor_intensity %}
-      {% include "tastings/_field.html" with field=form.flavor_malt %}
-      {% include "tastings/_field.html" with field=form.flavor_hop %}
-      {% include "tastings/_field.html" with field=form.bitterness %}
-      {% include "tastings/_field.html" with field=form.sweetness %}
-      {% include "tastings/_field.html" with field=form.acidity %}
-    </div>
+    {% include "tastings/_field.html" with field=form.flavor_intensity %}
+    {% include "tastings/_field.html" with field=form.flavor_impression %}
     {% include "tastings/_field.html" with field=form.finish %}
     <details{% if form.flavor_descriptors.value %} open{% endif %}><summary>Descripteurs de saveurs</summary>
       <div class="descriptors">{{ form.flavor_descriptors }}</div>

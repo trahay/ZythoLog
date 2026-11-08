@@ -25,8 +25,7 @@ def payload(**extra):
         "date": "2026-11-01", "color_ebc": "12", "clarity": "2", "head_retention": "3",
         "aroma_intensity": "4", "aroma_impression": "5",
         "aroma_descriptors": ["agrumes", "tropical"],
-        "flavor_intensity": "4", "flavor_malt": "2", "flavor_hop": "4", "bitterness": "4",
-        "sweetness": "1", "acidity": "0", "flavor_descriptors": ["resineux"],
+        "flavor_intensity": "4", "flavor_impression": "4", "flavor_descriptors": ["resineux"],
         "body": "2", "carbonation": "4", "alcohol_warmth": "1", "astringency": "0",
         "off_flavors": [], "rating": "7.5", "notes": "Très houblonnée.",
     }
