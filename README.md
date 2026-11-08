@@ -33,9 +33,35 @@ Puis ouvrir http://localhost:8000. Tests : `.venv/bin/python manage.py test tast
 - À la connexion ou à la création d'un compte, les fiches anonymes de la session
   sont automatiquement rattachées au compte.
 
-## Avant une mise en production
+## Déploiement avec Docker
 
-définir les variables d'environnement `DJANGO_SECRET_KEY` (clé aléatoire),
-`DJANGO_DEBUG=0` et `DJANGO_ALLOWED_HOSTS` (ex. `zytholog.example.org`),
-servir `media/` (photos) et les fichiers statiques via le serveur web
-(`collectstatic`), et idéalement une base PostgreSQL.
+La pile `docker-compose.yml` lance trois conteneurs :
+
+- `web` : Django servi par gunicorn (migrations et `collectstatic` au démarrage) ;
+- `nginx` : sert les fichiers statiques et les photos, transmet le reste à Django,
+  et écoute uniquement en local sur `127.0.0.1:${ZYTHOLOG_PORT}` (9003 par défaut) ;
+- `postgres` : la base de données.
+
+L'appli est prévue pour être servie sous un préfixe (`/zytholog` par défaut,
+variable `ZYTHOLOG_PATH`) derrière un reverse proxy HTTPS (YunoHost).
+
+```bash
+cp .env.sample .env   # puis remplir les secrets
+docker compose up -d --build
+docker compose exec web python manage.py createsuperuser   # compte admin
+```
+
+Mise à jour : `git pull && docker compose up -d --build`.
+
+Données persistantes (volumes Docker) : `postgres_data` (base) et `media` (photos).
+Sauvegarde de la base :
+
+```bash
+docker compose exec postgres pg_dump -U zytholog zytholog > zytholog.sql
+```
+
+### Côté YunoHost
+
+Installer l'appli « Redirect » sur `trahay.nohost.me/zytholog`, en mode
+reverse proxy vers `http://127.0.0.1:9003/zytholog`, visible par les visiteurs
+(public) pour qu'on puisse noter sans compte.

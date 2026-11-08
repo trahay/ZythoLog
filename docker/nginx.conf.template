@@ -1,0 +1,32 @@
+# nginx interne : sert les fichiers statiques et les photos, transmet le reste
+# à Django (gunicorn). ${ZYTHOLOG_PATH} est remplacé au démarrage du conteneur.
+# Le préfixe est accepté qu'il soit conservé ou retiré par le reverse proxy
+# de YunoHost : s'il manque, on le rajoute avant de transmettre à Django.
+server {
+    listen 80;
+    client_max_body_size 50M;
+    absolute_redirect off;
+
+    location ~ ^(?:${ZYTHOLOG_PATH})?/static/(.*)$ {
+        alias /data/static/$1;
+        expires 7d;
+    }
+
+    location ~ ^(?:${ZYTHOLOG_PATH})?/media/(.*)$ {
+        alias /data/media/$1;
+        expires 7d;
+    }
+
+    location ${ZYTHOLOG_PATH}/ {
+        include /etc/nginx/conf.d/proxy_django.inc;
+    }
+
+    location = ${ZYTHOLOG_PATH} {
+        return 301 ${ZYTHOLOG_PATH}/;
+    }
+
+    location / {
+        rewrite ^(.*)$ ${ZYTHOLOG_PATH}$1 break;
+        include /etc/nginx/conf.d/proxy_django.inc;
+    }
+}

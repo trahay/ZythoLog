@@ -1,0 +1,50 @@
+services:
+  web:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      POSTGRES_HOST: postgres
+      # L'appli est servie sous ce préfixe (ex. https://trahay.nohost.me/zytholog)
+      SCRIPT_NAME: ${ZYTHOLOG_PATH:-/zytholog}
+    volumes:
+      - static:/data/static
+      - media:/data/media
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    ports:
+      # Uniquement en local : le nginx de YunoHost fait le reverse proxy HTTPS
+      - "127.0.0.1:${ZYTHOLOG_PORT:-9003}:80"
+    environment:
+      ZYTHOLOG_PATH: ${ZYTHOLOG_PATH:-/zytholog}
+    volumes:
+      - ./docker/nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - ./docker/proxy_django.inc:/etc/nginx/conf.d/proxy_django.inc:ro
+      - static:/data/static:ro
+      - media:/data/media:ro
+    depends_on:
+      - web
+
+  postgres:
+    image: postgres:18
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      # -h localhost : pendant l'initialisation, postgres n'écoute que sur un
+      # socket unix ; on ne le considère pas prêt à ce moment-là.
+      test: ["CMD-SHELL", "pg_isready -h localhost -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+volumes:
+  static:
+  media:
+  postgres_data:

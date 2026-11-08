@@ -1,0 +1,9 @@
+.git
+.venv
+.claude
+.env
+db.sqlite3
+media
+staticfiles
+__pycache__
+*.pyc
