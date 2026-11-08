@@ -6,7 +6,7 @@
     <h1><a href="{{ t.beer.get_absolute_url }}">{{ t.beer.name }}</a></h1>
     <p class="muted">
       <a href="{{ t.beer.brewery.get_absolute_url }}">{{ t.beer.brewery.name }}</a>
-      {% if t.beer.style %} · {{ t.beer.style }}{% endif %}
+      {% if t.beer.style %} · <a href="{% url 'tastings:beer_list' %}?style={{ t.beer.style|urlencode }}">{{ t.beer.style }}</a>{% endif %}
       {% if t.beer.abv is not None %} · {{ t.beer.abv }} % vol.{% endif %}
       {% if t.beer.ibu is not None %} · {{ t.beer.ibu }} IBU{% endif %}
     </p>

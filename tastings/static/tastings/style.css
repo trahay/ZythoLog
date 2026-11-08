@@ -32,7 +32,8 @@ button.link { background: none; border: 0; color: var(--accent); cursor: pointer
 .secret { word-break: break-all; user-select: all; }
 .hero { padding: 24px 0 8px; }
 .search { display: flex; gap: 8px; margin: 12px 0; max-width: 560px; }
-.search input { flex: 1; }
+.search input { flex: 1; min-width: 0; }
+.search select { max-width: 40%; }
 input, select, textarea { font: inherit; padding: 7px 9px; border: 1px solid var(--border); border-radius: 6px;
   background: var(--surface); color: var(--text); max-width: 100%; }
 textarea { width: 100%; }

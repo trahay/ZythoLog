@@ -198,16 +198,69 @@ OFF_FLAVORS = [
     ]),
 ]
 
-COMMON_STYLES = [
-    "Lager", "Pils", "Helles", "Märzen", "Bock", "Doppelbock", "Schwarzbier",
-    "Witbier", "Weizen / Hefeweizen", "Saison", "Blonde belge", "Dubbel",
-    "Tripel", "Quadrupel", "Belgian Strong Ale", "Bière de garde",
-    "Pale Ale", "American Pale Ale", "IPA", "West Coast IPA", "NEIPA",
-    "Double IPA", "Session IPA", "Black IPA", "Bitter", "ESB", "Amber Ale",
-    "Brown Ale", "Porter", "Stout", "Imperial Stout", "Oatmeal Stout",
-    "Milk Stout", "Barley Wine", "Scotch Ale", "Berliner Weisse", "Gose",
-    "Lambic", "Gueuze", "Kriek", "Sour / Wild Ale", "Fruit Beer",
+# Styles de bière, d'après https://fr.wikipedia.org/wiki/Liste_des_styles_de_bière
+# (classement « Détails de certains types de bières » et « Hybrides et bières
+# spéciales »). Les styles marqués « (*) » n'y figurent pas mais sont courants.
+BEER_STYLES = [
+    ("Ales américaines", [
+        "Pale ale américaine (APA)", "Ale ambrée américaine", "Brown ale américaine",
+    ]),
+    ("Ale québécoise", ["Annedd'ale"]),
+    ("Ales fortes", ["Old ale", "Barley wine britannique", "Barley wine américain"]),
+    ("Belges", [
+        "Blanche (witbier)", "Pale ale belge", "Saison", "Bière de garde", "Spéciale belge",
+    ]),
+    ("Belges fortes", ["Blonde belge", "Dubbel", "Triple", "Belge forte", "Quadruple"]),
+    ("Bières acidulées", [
+        "Berliner Weisse", "Rouge de Flandres", "Brune de Flandres (oud bruin)", "Lambic",
+        "Gueuze", "Lambic aux fruits", "Gose",
+    ]),
+    ("Bitter et pale ale", [
+        "Ordinary bitter", "Best bitter", "Extra special bitter (ESB) / English pale ale",
+    ]),
+    ("Bock", ["Maibock / Helles bock", "Bock", "Doppelbock", "Eisbock"]),
+    ("Brown ale", ["Mild", "Southern English brown ale", "Northern English brown ale"]),
+    ("Hybrides ambrées", ["Altbier du nord", "California common (steam beer)", "Altbier de Düsseldorf"]),
+    ("Hybrides blondes", ["Cream ale", "Ale blonde", "Kölsch", "Bière de blé ou de seigle américaine"]),
+    ("India pale ale (IPA)", [
+        "IPA britannique", "IPA américaine", "Imperial IPA (double IPA)",
+        "NEIPA / Hazy IPA (*)", "Session IPA (*)", "Black IPA (*)",
+    ]),
+    ("Lagers ambrées", ["Viennoise", "Märzen / Oktoberfest", "Rauchbier"]),
+    ("Lagers blondes", [
+        "American light lager", "Lager standard américaine", "Lager premium américaine",
+        "Munich Helles", "Dortmunder export",
+    ]),
+    ("Lagers foncées", ["Lager foncée américaine", "Munich Dunkel", "Schwarzbier"]),
+    ("Pilsner", ["Pilsner allemande (pils)", "Pilsner bohémienne", "Pilsner américaine classique"]),
+    ("Porter", ["Brown porter", "Robust porter", "Porter baltique"]),
+    ("Scottish et Irish ale", [
+        "Scottish light 60/-", "Scottish heavy 70/-", "Scottish export 80/-",
+        "Irish red ale", "Scotch ale",
+    ]),
+    ("Stout", [
+        "Dry stout", "Sweet stout (milk stout)", "Oatmeal stout", "Foreign extra stout",
+        "Stout américaine", "Imperial stout",
+    ]),
+    ("Weizen", ["Weizen / Weissbier", "Dunkelweizen", "Weizenbock", "Roggenbier"]),
+    ("Bières spéciales", [
+        "Bière aux fruits", "Bière aux herbes et épices", "Bière au miel",
+        "Bière aux céréales alternatives", "Bière fumée", "Bière aux légumes (citrouille…)",
+        "Bière sauvage (Brett, fermentation mixte)", "Bière vieillie en fût",
+    ]),
+    ("Boissons apparentées", ["Gruit", "Sahti", "Kvas", "Braggot"]),
+    ("Autre", ["Autre style"]),
 ]
+
+ALL_STYLES = [style for _, styles in BEER_STYLES for style in styles]
+
+
+def style_choices():
+    """Choix groupés pour un <select> (valeur = libellé)."""
+    return [("", "— Choisir un style —")] + [
+        (group, [(s, s) for s in styles]) for group, styles in BEER_STYLES
+    ]
+
 
 
 def flatten(grouped):

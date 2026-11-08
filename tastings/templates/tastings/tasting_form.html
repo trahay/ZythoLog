@@ -113,11 +113,9 @@
   {% if tasting %}<a class="btn" href="{{ tasting.get_absolute_url }}">Annuler</a>{% endif %}
 </form>
 
-<datalist id="dl-styles">{% for s in styles %}<option value="{{ s }}">{% endfor %}</datalist>
 <datalist id="dl-breweries">{% for b in breweries %}<option value="{{ b }}">{% endfor %}</datalist>
 <datalist id="dl-beers">{% for b in beer_names %}<option value="{{ b }}">{% endfor %}</datalist>
 <script>
-  document.getElementById("id_style").setAttribute("list", "dl-styles");
   document.getElementById("id_brewery_name").setAttribute("list", "dl-breweries");
   document.getElementById("id_beer_name").setAttribute("list", "dl-beers");
 </script>

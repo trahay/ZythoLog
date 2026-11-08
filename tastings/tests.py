@@ -21,7 +21,7 @@ def png(name="biere.png"):
 
 def payload(**extra):
     data = {
-        "beer_name": "Punk IPA", "brewery_name": "BrewDog", "style": "IPA", "abv": "5.4",
+        "beer_name": "Punk IPA", "brewery_name": "BrewDog", "style": "IPA américaine", "abv": "5.4",
         "date": "2026-11-01", "color_ebc": "12", "clarity": "limpide", "head_retention": "3",
         "aroma_intensity": "4", "aroma_malt": "1", "aroma_hop": "5", "aroma_yeast": "1",
         "aroma_descriptors": ["agrumes", "tropical"],
@@ -50,7 +50,7 @@ class TastingTests(TestCase):
         self.assertEqual(t.author_display, "Bob")
         self.assertEqual(t.photos.count(), 2)
         self.assertEqual(t.aroma_descriptors, ["agrumes", "tropical"])
-        self.assertEqual(t.beer.style, "IPA")
+        self.assertEqual(t.beer.style, "IPA américaine")
         # L'auteur anonyme la retrouve et peut la modifier
         self.assertContains(self.client.get(reverse("tastings:my_tastings")), "Punk IPA")
         self.assertEqual(self.client.get(reverse("tastings:tasting_edit", args=[t.pk])).status_code, 200)
@@ -88,6 +88,23 @@ class TastingTests(TestCase):
         self.assertEqual(alice.tastings.count(), 2)
         r = self.client.get(reverse("tastings:my_tastings"))
         self.assertEqual(len(r.context["page"]), 2)
+
+    def test_style_from_list_and_filter(self):
+        r = self.client.post(reverse("tastings:tasting_create"), payload(style="Bière inventée"))
+        self.assertEqual(r.status_code, 200)
+        self.assertIn("style", r.context["form"].errors)
+        self.client.post(reverse("tastings:tasting_create"), payload())
+        self.client.post(reverse("tastings:tasting_create"),
+                         payload(beer_name="Rochefort 10", brewery_name="Rochefort", style="Quadruple"))
+        r = self.client.get(reverse("tastings:beer_list"), {"style": "Quadruple"})
+        self.assertEqual([b.name for b in r.context["page"]], ["Rochefort 10"])
+
+    def test_off_list_style_kept_on_edit(self):
+        self.client.post(reverse("tastings:tasting_create"), payload())
+        t = Tasting.objects.get()
+        Beer.objects.update(style="Vieux style maison")
+        r = self.client.get(reverse("tastings:tasting_edit", args=[t.pk]))
+        self.assertContains(r, '<option value="Vieux style maison" selected>')
 
     def test_rating_bounds(self):
         r = self.client.post(reverse("tastings:tasting_create"), payload(rating="11"))

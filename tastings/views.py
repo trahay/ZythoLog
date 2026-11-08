@@ -33,8 +33,11 @@ def beer_list(request):
     if q:
         beers = beers.filter(Q(name__icontains=q) | Q(brewery__name__icontains=q)
                              | Q(style__icontains=q))
+    style = form.data.get("style", "")
+    if style:
+        beers = beers.filter(style=style)
     return render(request, "tastings/beer_list.html", {
-        "page": paginate(request, beers), "search_form": form, "q": q,
+        "page": paginate(request, beers), "search_form": form, "q": q, "style": style,
     })
 
 
@@ -81,7 +84,7 @@ def _save_tasting(request, form, tasting=None):
 
 
 def tasting_form_context(form, **extra):
-    return {"form": form, "styles": c.COMMON_STYLES,
+    return {"form": form,
             "breweries": Brewery.objects.values_list("name", flat=True),
             "beer_names": Beer.objects.values_list("name", flat=True).distinct(), **extra}
 

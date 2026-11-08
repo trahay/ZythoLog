@@ -65,7 +65,7 @@ class TastingForm(forms.ModelForm):
     # Champs décrivant la bière (créée à la volée si inconnue)
     beer_name = forms.CharField(label="Nom de la bière", max_length=200)
     brewery_name = forms.CharField(label="Brasserie", max_length=200)
-    style = forms.CharField(label="Style", max_length=100, required=False)
+    style = forms.ChoiceField(label="Style", choices=c.style_choices, required=False)
     abv = forms.DecimalField(label="Alcool (% vol.)", required=False, min_value=0,
                              max_value=70, decimal_places=1)
     ibu = forms.IntegerField(label="Amertume (IBU)", required=False, min_value=0)
@@ -112,6 +112,11 @@ class TastingForm(forms.ModelForm):
         if user is not None and user.is_authenticated:
             del self.fields["author_name"]
         beer = self.instance.beer if self.instance.pk else None
+        # Style déjà enregistré mais absent de la liste : on le garde sélectionnable
+        current = (beer.style if beer else "") or self.initial.get("style") or ""
+        if current and current not in c.ALL_STYLES:
+            self.fields["style"].choices = [
+                *c.style_choices(), ("Style actuel (hors liste)", [(current, current)])]
         if beer:
             self.initial.update(beer_name=beer.name, brewery_name=beer.brewery.name,
                                 style=beer.style, abv=beer.abv, ibu=beer.ibu)
@@ -155,3 +160,7 @@ class SignUpForm(UserCreationForm):
 class BeerSearchForm(forms.Form):
     q = forms.CharField(label="Rechercher", required=False,
                         widget=forms.TextInput(attrs={"placeholder": "Bière, brasserie ou style…"}))
+    style = forms.ChoiceField(
+        label="Style", required=False,
+        choices=lambda: [("", "Tous les styles")] + c.style_choices()[1:],
+    )
