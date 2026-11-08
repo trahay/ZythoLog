@@ -178,3 +178,57 @@ class GoogleLoginTests(TestCase):
         account = SocialAccount.objects.get(provider="google", uid="1234567890")
         self.assertEqual(account.user.email, "bob@gmail.com")
         self.assertEqual(Tasting.objects.get().user, account.user)
+
+
+@override_settings(MEDIA_ROOT=MEDIA)
+class QrCodeTests(TestCase):
+    def setUp(self):
+        self.seller = User.objects.create_user("brasseur", password="Houblon-2026!")
+
+    def create_beer(self):
+        self.client.force_login(self.seller)
+        r = self.client.post(reverse("tastings:beer_create"), {
+            "beer_name": "Ma Saison", "brewery_name": "Ma Brasserie", "style": "Saison",
+            "abv": "6.5", "ibu": "28"})
+        beer = Beer.objects.get()
+        self.assertRedirects(r, reverse("tastings:beer_labels", args=[beer.pk]))
+        self.client.logout()
+        return beer
+
+    def test_beer_create_requires_login(self):
+        r = self.client.get(reverse("tastings:beer_create"))
+        self.assertEqual(r.status_code, 302)
+        self.assertIn(reverse("login"), r["Location"])
+
+    def test_qrcode_and_labels(self):
+        beer = self.create_beer()
+        r = self.client.get(reverse("tastings:beer_qrcode", args=[beer.pk]))
+        self.assertEqual(r["Content-Type"], "image/svg+xml")
+        self.assertTrue(r.content.lstrip().startswith(b"<svg"))
+        r = self.client.get(reverse("tastings:beer_labels", args=[beer.pk]), {"n": "100"})
+        self.assertEqual(r.context["count"], 24)
+        self.assertEqual(r.context["scan_url"], "http://testserver/b/%d/" % beer.pk)
+        self.assertContains(r, "Notez cette bière", count=24)
+
+    def test_scan_prefills_and_locks_beer(self):
+        beer = self.create_beer()
+        r = self.client.get(reverse("tastings:beer_scan", args=[beer.pk]))
+        self.assertRedirects(r, reverse("tastings:tasting_create") + f"?beer={beer.pk}")
+        r = self.client.get(r["Location"])
+        self.assertContains(r, "Vous dégustez")
+        self.assertContains(r, "Ma Saison")
+        self.assertNotIn("beer_name", r.context["form"].fields)
+        # Un client tente de modifier les infos de la bière : elles sont ignorées
+        data = payload(beer_name="Autre", brewery_name="Autre", style="Stout américaine", abv="12")
+        r = self.client.post(reverse("tastings:tasting_create") + f"?beer={beer.pk}", data)
+        t = Tasting.objects.get()
+        self.assertRedirects(r, t.get_absolute_url())
+        self.assertEqual(t.beer, beer)
+        beer.refresh_from_db()
+        self.assertEqual((beer.style, str(beer.abv)), ("Saison", "6.5"))
+        self.assertEqual(Beer.objects.count(), 1)
+
+    def test_bad_beer_param_falls_back_to_normal_form(self):
+        r = self.client.get(reverse("tastings:tasting_create"), {"beer": "abc"})
+        self.assertEqual(r.status_code, 200)
+        self.assertIn("beer_name", r.context["form"].fields)

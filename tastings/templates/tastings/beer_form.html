@@ -1,0 +1,13 @@
+{% extends "tastings/base.html" %}
+{% block title %}Ajouter une bière{% endblock %}
+{% block content %}
+<div class="narrow">
+<h1>Ajouter une bière</h1>
+<p class="muted">Pour une bière que vous vendez : une fois enregistrée, vous pourrez imprimer son QR code.
+  En le scannant, vos clients arrivent sur une fiche de dégustation déjà remplie avec ces informations.</p>
+<form method="post">{% csrf_token %}
+  {% for field in form %}{% include "tastings/_field.html" %}{% endfor %}
+  <button class="btn btn-primary" type="submit">Enregistrer et créer le QR code</button>
+</form>
+</div>
+{% endblock %}

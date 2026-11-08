@@ -107,3 +107,27 @@ details { margin: 10px 0; } summary { cursor: pointer; font-weight: 600; }
 .separator::before, .separator::after { content: ""; flex: 1; border-top: 1px solid var(--border); }
 .btn-google { display: inline-flex; align-items: center; gap: 10px; width: 100%; justify-content: center; font-weight: 600; }
 .btn-google:hover { border-color: var(--accent); }
+/* Bière imposée (QR code) */
+.fixed-beer { display: flex; gap: 14px; align-items: center; background: var(--surface); border: 2px solid var(--accent);
+  border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; }
+.fixed-beer strong { display: block; font-size: 1.25em; }
+.fixed-beer-icon { font-size: 2.2em; }
+/* Étiquettes QR code */
+.labels-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 12px 0; }
+.labels-toolbar input { width: 5em; }
+.labels { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; margin-top: 16px; }
+.label { display: flex; align-items: center; gap: 12px; padding: 10px; background: #fff; color: #222;
+  border: 1px dashed #999; border-radius: 6px; break-inside: avoid; }
+.label img { width: 120px; height: 120px; flex: none; }
+.label-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.label-cta { color: #8f5508; font-size: 1.05em; }
+.label-beer { font-weight: 700; font-size: 1.15em; }
+.label-meta { font-size: .85em; color: #555; }
+.label-brand { font-size: .8em; color: #8f5508; margin-top: 4px; }
+@media print {
+  .topbar, footer, .no-print, .alert { display: none !important; }
+  body { background: #fff; }
+  main.wrap { padding: 0; max-width: none; }
+  .labels { grid-template-columns: repeat(2, 1fr); gap: 4mm; margin: 0; }
+  .label { border-radius: 0; }
+}

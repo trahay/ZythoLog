@@ -1,5 +1,9 @@
+import segno
 from django.contrib import messages
 from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from django.urls import reverse
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db.models import Q
@@ -8,7 +12,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from . import choices as c
 from . import ownership
-from .forms import BeerSearchForm, SignUpForm, TastingForm
+from .forms import BeerForm, BeerSearchForm, SignUpForm, TastingForm
 from .models import Beer, Brewery, Photo, Tasting
 
 
@@ -90,13 +94,13 @@ def tasting_form_context(form, **extra):
 
 
 def tasting_create(request):
-    initial = {}
-    beer_id = request.GET.get("beer")
-    if beer_id and (beer := Beer.objects.filter(pk=beer_id).select_related("brewery").first()):
-        initial = {"beer_name": beer.name, "brewery_name": beer.brewery.name,
-                   "style": beer.style, "abv": beer.abv, "ibu": beer.ibu}
+    # ?beer=<id> (lien « Déguster cette bière » ou QR code) : la bière est imposée
+    beer = None
+    beer_id = request.GET.get("beer", "")
+    if beer_id.isdigit():
+        beer = Beer.objects.filter(pk=beer_id).select_related("brewery").first()
     if request.method == "POST":
-        form = TastingForm(request.POST, request.FILES, user=request.user)
+        form = TastingForm(request.POST, request.FILES, user=request.user, beer=beer)
         if form.is_valid():
             tasting = _save_tasting(request, form)
             if not request.user.is_authenticated:
@@ -109,7 +113,7 @@ def tasting_create(request):
                 messages.success(request, "Dégustation enregistrée.")
             return redirect(tasting)
     else:
-        form = TastingForm(initial=initial, user=request.user)
+        form = TastingForm(user=request.user, beer=beer)
     return render(request, "tastings/tasting_form.html", tasting_form_context(form))
 
 
@@ -177,3 +181,48 @@ def signup(request):
     else:
         form = SignUpForm()
     return render(request, "registration/signup.html", {"form": form})
+
+
+# --- Bières vendues : ajout d'une bière et QR code à imprimer ---------------
+
+@login_required
+def beer_create(request):
+    form = BeerForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        beer = form.save()
+        messages.success(request, f"« {beer.name} » est enregistrée. Voici son QR code à imprimer.")
+        return redirect("tastings:beer_labels", pk=beer.pk)
+    return render(request, "tastings/beer_form.html", {"form": form})
+
+
+def beer_scan(request, pk):
+    """Adresse courte encodée dans le QR code : ouvre le formulaire pré-rempli."""
+    beer = get_object_or_404(Beer, pk=pk)
+    return redirect(f"{reverse('tastings:tasting_create')}?beer={beer.pk}")
+
+
+def beer_scan_url(request, beer):
+    return request.build_absolute_uri(reverse("tastings:beer_scan", args=[beer.pk]))
+
+
+def beer_qrcode(request, pk):
+    beer = get_object_or_404(Beer, pk=pk)
+    qr = segno.make(beer_scan_url(request, beer), error="m")
+    response = HttpResponse(content_type="image/svg+xml")
+    qr.save(response, kind="svg", scale=10, border=2, xmldecl=False, svgns=True)
+    if request.GET.get("download"):
+        response["Content-Disposition"] = f'attachment; filename="zytholog-{beer.pk}.svg"'
+    return response
+
+
+def beer_labels(request, pk):
+    """Planche d'étiquettes à imprimer et découper."""
+    beer = get_object_or_404(Beer.objects.select_related("brewery"), pk=pk)
+    try:
+        count = min(max(int(request.GET.get("n", 6)), 1), 24)
+    except ValueError:
+        count = 6
+    return render(request, "tastings/beer_labels.html", {
+        "beer": beer, "count": count, "labels": range(count),
+        "scan_url": beer_scan_url(request, beer),
+    })

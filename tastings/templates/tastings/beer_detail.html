@@ -18,7 +18,10 @@
     {% endif %}
   </div>
 </div>
-<a class="btn btn-primary" href="{% url 'tastings:tasting_create' %}?beer={{ beer.pk }}">Déguster cette bière</a>
+<div class="actions">
+  <a class="btn btn-primary" href="{% url 'tastings:tasting_create' %}?beer={{ beer.pk }}">Déguster cette bière</a>
+  <a class="btn" href="{% url 'tastings:beer_labels' beer.pk %}">QR code à imprimer</a>
+</div>
 
 <h2>Toutes les dégustations</h2>
 <div class="grid">

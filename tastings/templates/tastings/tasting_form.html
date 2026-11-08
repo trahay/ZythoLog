@@ -12,6 +12,17 @@
   {% if form.non_field_errors %}<div class="alert alert-error">{{ form.non_field_errors }}</div>{% endif %}
   {% if form.errors %}<div class="alert alert-error">Le formulaire contient des erreurs, voir ci-dessous.</div>{% endif %}
 
+  {% if form.fixed_beer %}{% with beer=form.fixed_beer %}
+  <div class="fixed-beer">
+    <span class="fixed-beer-icon">🍺</span>
+    <div>
+      <span class="muted small">Vous dégustez</span>
+      <strong>{{ beer.name }}</strong>
+      <div class="muted small">{{ beer.brewery.name }}{% if beer.style %} · {{ beer.style }}{% endif %}{% if beer.abv is not None %} · {{ beer.abv }} % vol.{% endif %}{% if beer.ibu is not None %} · {{ beer.ibu }} IBU{% endif %}</div>
+      <a class="small" href="{% url 'tastings:tasting_create' %}">Ce n'est pas cette bière ?</a>
+    </div>
+  </div>
+  {% endwith %}{% else %}
   <fieldset>
     <legend>🍺 La bière</legend>
     <div class="cols">
@@ -22,6 +33,7 @@
       {% include "tastings/_field.html" with field=form.ibu %}
     </div>
   </fieldset>
+  {% endif %}
 
   <fieldset>
     <legend>📅 La dégustation</legend>
@@ -116,7 +128,7 @@
 <datalist id="dl-breweries">{% for b in breweries %}<option value="{{ b }}">{% endfor %}</datalist>
 <datalist id="dl-beers">{% for b in beer_names %}<option value="{{ b }}">{% endfor %}</datalist>
 <script>
-  document.getElementById("id_brewery_name").setAttribute("list", "dl-breweries");
-  document.getElementById("id_beer_name").setAttribute("list", "dl-beers");
+  document.getElementById("id_brewery_name")?.setAttribute("list", "dl-breweries");
+  document.getElementById("id_beer_name")?.setAttribute("list", "dl-beers");
 </script>
 {% endblock %}

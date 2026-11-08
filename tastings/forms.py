@@ -61,14 +61,52 @@ INTENSITY_FIELDS = [
 ]
 
 
-class TastingForm(forms.ModelForm):
-    # Champs décrivant la bière (créée à la volée si inconnue)
+BEER_FIELDS = ["beer_name", "brewery_name", "style", "abv", "ibu"]
+
+
+def get_or_update_beer(data):
+    """Retrouve (sans tenir compte de la casse) ou crée la brasserie et la bière.
+
+    Les infos renseignées (style, degré, IBU) mettent à jour la fiche de la bière.
+    """
+    brewery_name = data["brewery_name"].strip()
+    brewery = (Brewery.objects.filter(name__iexact=brewery_name).first()
+               or Brewery.objects.create(name=brewery_name))
+    beer_name = data["beer_name"].strip()
+    beer = Beer.objects.filter(name__iexact=beer_name, brewery=brewery).first()
+    if beer is None:
+        beer = Beer(name=beer_name, brewery=brewery)
+    for field in ("style", "abv", "ibu"):
+        if data.get(field) not in (None, ""):
+            setattr(beer, field, data[field])
+    beer.save()
+    return beer
+
+
+class BeerFieldsForm(forms.Form):
+    """Champs décrivant une bière (créée à la volée si inconnue)."""
     beer_name = forms.CharField(label="Nom de la bière", max_length=200)
     brewery_name = forms.CharField(label="Brasserie", max_length=200)
     style = forms.ChoiceField(label="Style", choices=c.style_choices, required=False)
     abv = forms.DecimalField(label="Alcool (% vol.)", required=False, min_value=0,
                              max_value=70, decimal_places=1)
     ibu = forms.IntegerField(label="Amertume (IBU)", required=False, min_value=0)
+
+    def keep_current_style(self, current):
+        """Un style déjà enregistré mais absent de la liste reste sélectionnable."""
+        if current and current not in c.ALL_STYLES and "style" in self.fields:
+            self.fields["style"].choices = [
+                *c.style_choices(), ("Style actuel (hors liste)", [(current, current)])]
+
+
+class BeerForm(BeerFieldsForm):
+    """Ajout d'une bière (par exemple pour imprimer son QR code avant de la vendre)."""
+
+    def save(self):
+        return get_or_update_beer(self.cleaned_data)
+
+
+class TastingForm(forms.ModelForm, BeerFieldsForm):
 
     aroma_descriptors = forms.MultipleChoiceField(
         label="Descripteurs d'arômes", choices=c.DESCRIPTORS, required=False,
@@ -100,8 +138,13 @@ class TastingForm(forms.ModelForm):
             "notes": forms.Textarea(attrs={"rows": 5}),
         }
 
-    def __init__(self, *args, user=None, **kwargs):
+    def __init__(self, *args, user=None, beer=None, **kwargs):
         super().__init__(*args, **kwargs)
+        # Bière imposée (arrivée par un QR code) : ses infos ne sont pas modifiables
+        self.fixed_beer = beer
+        if beer is not None:
+            for name in BEER_FIELDS:
+                del self.fields[name]
         for name in INTENSITY_FIELDS:
             self.fields[name].widget = RangeInput(dict(c.INTENSITY))
             self.fields[name].required = False  # 0 par défaut (voir clean)
@@ -112,11 +155,7 @@ class TastingForm(forms.ModelForm):
         if user is not None and user.is_authenticated:
             del self.fields["author_name"]
         beer = self.instance.beer if self.instance.pk else None
-        # Style déjà enregistré mais absent de la liste : on le garde sélectionnable
-        current = (beer.style if beer else "") or self.initial.get("style") or ""
-        if current and current not in c.ALL_STYLES:
-            self.fields["style"].choices = [
-                *c.style_choices(), ("Style actuel (hors liste)", [(current, current)])]
+        self.keep_current_style((beer.style if beer else "") or self.initial.get("style") or "")
         if beer:
             self.initial.update(beer_name=beer.name, brewery_name=beer.brewery.name,
                                 style=beer.style, abv=beer.abv, ibu=beer.ibu)
@@ -129,21 +168,9 @@ class TastingForm(forms.ModelForm):
         return cleaned
 
     def save_beer(self):
-        """Retrouve (sans tenir compte de la casse) ou crée la brasserie et la bière."""
-        d = self.cleaned_data
-        brewery_name = d["brewery_name"].strip()
-        brewery = (Brewery.objects.filter(name__iexact=brewery_name).first()
-                   or Brewery.objects.create(name=brewery_name))
-        beer_name = d["beer_name"].strip()
-        beer = Beer.objects.filter(name__iexact=beer_name, brewery=brewery).first()
-        if beer is None:
-            beer = Beer(name=beer_name, brewery=brewery)
-        # Les infos renseignées (style, degré, IBU) mettent à jour la fiche de la bière
-        for field in ("style", "abv", "ibu"):
-            if d.get(field) not in (None, ""):
-                setattr(beer, field, d[field])
-        beer.save()
-        return beer
+        if self.fixed_beer is not None:
+            return self.fixed_beer
+        return get_or_update_beer(self.cleaned_data)
 
     def save(self, commit=True):
         self.instance.beer = self.save_beer()

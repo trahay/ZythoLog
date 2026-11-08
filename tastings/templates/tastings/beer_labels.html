@@ -1,0 +1,32 @@
+{% extends "tastings/base.html" %}
+{% block title %}QR code – {{ beer.name }}{% endblock %}
+{% block content %}
+<div class="no-print">
+  <h1>QR code de « {{ beer.name }} »</h1>
+  <p class="muted">En scannant ce QR code, vos clients ouvrent une fiche de dégustation déjà remplie
+    (nom, brasserie, style, alcool, amertume). Aucun compte n'est nécessaire pour la remplir.</p>
+  <form method="get" class="labels-toolbar">
+    <label for="n">Nombre d'étiquettes</label>
+    <input type="number" id="n" name="n" min="1" max="24" value="{{ count }}">
+    <button class="btn" type="submit">Mettre à jour</button>
+    <button class="btn btn-primary" type="button" onclick="window.print()">🖨 Imprimer</button>
+    <a class="btn" href="{% url 'tastings:beer_qrcode' beer.pk %}?download=1">Télécharger le QR code (SVG)</a>
+  </form>
+  <p class="small muted">Adresse encodée : <a href="{{ scan_url }}">{{ scan_url }}</a></p>
+</div>
+
+<div class="labels">
+  {% for _ in labels %}
+  <div class="label">
+    <img src="{% url 'tastings:beer_qrcode' beer.pk %}" alt="QR code pour noter {{ beer.name }}">
+    <div class="label-text">
+      <strong class="label-cta">Notez cette bière !</strong>
+      <span class="label-beer">{{ beer.name }}</span>
+      <span class="label-meta">{{ beer.brewery.name }}</span>
+      <span class="label-meta">{% if beer.style %}{{ beer.style }}{% endif %}{% if beer.abv is not None %} · {{ beer.abv }} %{% endif %}{% if beer.ibu is not None %} · {{ beer.ibu }} IBU{% endif %}</span>
+      <span class="label-brand">🍺 ZythoLog</span>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
