@@ -1,0 +1,124 @@
+{% extends "tastings/base.html" %}
+{% block title %}{% if tasting %}Modifier la dégustation{% else %}Nouvelle dégustation{% endif %}{% endblock %}
+{% block content %}
+<h1>{% if tasting %}Modifier la dégustation{% else %}Nouvelle dégustation{% endif %}</h1>
+{% if not user.is_authenticated and not tasting %}
+  <p class="muted">Vous n'êtes pas connecté·e : vous pouvez quand même enregistrer votre dégustation.
+    <a href="{% url 'login' %}?next={{ request.path|urlencode }}">Se connecter</a> pour la rattacher à votre compte.</p>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data" class="tasting-form" novalidate>
+  {% csrf_token %}
+  {% if form.non_field_errors %}<div class="alert alert-error">{{ form.non_field_errors }}</div>{% endif %}
+  {% if form.errors %}<div class="alert alert-error">Le formulaire contient des erreurs, voir ci-dessous.</div>{% endif %}
+
+  <fieldset>
+    <legend>🍺 La bière</legend>
+    <div class="cols">
+      {% include "tastings/_field.html" with field=form.beer_name %}
+      {% include "tastings/_field.html" with field=form.brewery_name %}
+      {% include "tastings/_field.html" with field=form.style %}
+      {% include "tastings/_field.html" with field=form.abv %}
+      {% include "tastings/_field.html" with field=form.ibu %}
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>📅 La dégustation</legend>
+    <div class="cols">
+      {% include "tastings/_field.html" with field=form.date %}
+      {% include "tastings/_field.html" with field=form.serving %}
+      {% include "tastings/_field.html" with field=form.place %}
+      {% include "tastings/_field.html" with field=form.author_name %}
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>👁 Apparence</legend>
+    {% include "tastings/_field.html" with field=form.color_ebc %}
+    <div class="cols">
+      {% include "tastings/_field.html" with field=form.clarity %}
+      {% include "tastings/_field.html" with field=form.head_color %}
+      {% include "tastings/_field.html" with field=form.head_texture %}
+    </div>
+    {% include "tastings/_field.html" with field=form.head_retention %}
+    {% include "tastings/_field.html" with field=form.appearance_notes %}
+  </fieldset>
+
+  <fieldset>
+    <legend>👃 Arômes</legend>
+    <div class="cols">
+      {% include "tastings/_field.html" with field=form.aroma_intensity %}
+      {% include "tastings/_field.html" with field=form.aroma_malt %}
+      {% include "tastings/_field.html" with field=form.aroma_hop %}
+      {% include "tastings/_field.html" with field=form.aroma_yeast %}
+    </div>
+    <details{% if form.aroma_descriptors.value %} open{% endif %}><summary>Descripteurs d'arômes</summary>
+      <div class="descriptors">{{ form.aroma_descriptors }}</div>
+    </details>
+    {% include "tastings/_field.html" with field=form.aroma_notes %}
+  </fieldset>
+
+  <fieldset>
+    <legend>👅 Saveurs</legend>
+    <div class="cols">
+      {% include "tastings/_field.html" with field=form.flavor_intensity %}
+      {% include "tastings/_field.html" with field=form.flavor_malt %}
+      {% include "tastings/_field.html" with field=form.flavor_hop %}
+      {% include "tastings/_field.html" with field=form.bitterness %}
+      {% include "tastings/_field.html" with field=form.sweetness %}
+      {% include "tastings/_field.html" with field=form.acidity %}
+    </div>
+    {% include "tastings/_field.html" with field=form.finish %}
+    <details{% if form.flavor_descriptors.value %} open{% endif %}><summary>Descripteurs de saveurs</summary>
+      <div class="descriptors">{{ form.flavor_descriptors }}</div>
+    </details>
+    {% include "tastings/_field.html" with field=form.flavor_notes %}
+  </fieldset>
+
+  <fieldset>
+    <legend>✋ Sensation en bouche</legend>
+    {% include "tastings/_field.html" with field=form.body %}
+    {% include "tastings/_field.html" with field=form.carbonation %}
+    <div class="cols">
+      {% include "tastings/_field.html" with field=form.alcohol_warmth %}
+      {% include "tastings/_field.html" with field=form.astringency %}
+    </div>
+    {% include "tastings/_field.html" with field=form.mouthfeel_notes %}
+  </fieldset>
+
+  <fieldset>
+    <legend>⚠ Faux-goûts</legend>
+    <details{% if form.off_flavors.value %} open{% endif %}><summary>Faux-goûts éventuels</summary>
+      <div class="descriptors">{{ form.off_flavors }}</div>
+    </details>
+  </fieldset>
+
+  <fieldset>
+    <legend>⭐ Verdict</legend>
+    {% include "tastings/_field.html" with field=form.rating %}
+    {% include "tastings/_field.html" with field=form.notes %}
+    {% include "tastings/_field.html" with field=form.photos %}
+    {% if tasting and tasting.photos.all %}
+      <p class="small">Photos existantes (cocher pour supprimer) :</p>
+      <div class="photos small-photos">
+      {% for p in tasting.photos.all %}
+        <label><img src="{{ p.image.url }}" alt=""><input type="checkbox" name="delete_photos" value="{{ p.pk }}"> supprimer</label>
+      {% endfor %}
+      </div>
+    {% endif %}
+  </fieldset>
+
+  <button type="submit" class="btn btn-primary">Enregistrer</button>
+  {% if tasting %}<a class="btn" href="{{ tasting.get_absolute_url }}">Annuler</a>{% endif %}
+</form>
+
+<datalist id="dl-styles">{% for s in styles %}<option value="{{ s }}">{% endfor %}</datalist>
+<datalist id="dl-breweries">{% for b in breweries %}<option value="{{ b }}">{% endfor %}</datalist>
+<datalist id="dl-beers">{% for b in beer_names %}<option value="{{ b }}">{% endfor %}</datalist>
+<script>
+  document.getElementById("id_style").setAttribute("list", "dl-styles");
+  document.getElementById("id_brewery_name").setAttribute("list", "dl-breweries");
+  document.getElementById("id_beer_name").setAttribute("list", "dl-beers");
+</script>
+{% endblock %}

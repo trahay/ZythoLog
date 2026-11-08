@@ -1,0 +1,16 @@
+{% extends "tastings/base.html" %}
+{% block title %}{{ brewery.name }}{% endblock %}
+{% block content %}
+<h1>{{ brewery.name }}</h1>
+{% if brewery.country %}<p class="muted">{{ brewery.country }}</p>{% endif %}
+<table class="table">
+  <thead><tr><th>Bière</th><th>Style</th><th>Moyenne</th><th>Dégustations</th></tr></thead>
+  <tbody>
+  {% for b in beers %}
+    <tr><td><a href="{{ b.get_absolute_url }}">{{ b.name }}</a></td><td>{{ b.style }}</td>
+        <td>{% if b.avg_rating is not None %}{{ b.avg_rating|floatformat:1 }}/10{% else %}–{% endif %}</td>
+        <td>{{ b.tasting_count }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

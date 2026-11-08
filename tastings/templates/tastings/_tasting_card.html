@@ -1,0 +1,14 @@
+<a class="card tasting-card" href="{{ t.get_absolute_url }}">
+  {% with photo=t.photos.all|first %}
+    {% if photo %}<img src="{{ photo.image.url }}" alt="Photo de {{ t.beer.name }}">{% else %}<div class="placeholder">🍺</div>{% endif %}
+  {% endwith %}
+  <div class="card-body">
+    <span class="rating">{{ t.rating|floatformat:"-1" }}<small>/10</small></span>
+    {% if not hide_beer %}
+      <strong>{{ t.beer.name }}</strong>
+      <div class="muted">{{ t.beer.brewery.name }}{% if t.beer.style %} · {{ t.beer.style }}{% endif %}</div>
+    {% endif %}
+    <div class="muted small">{{ t.date|date:"d/m/Y" }} · par {{ t.author_display }}</div>
+    {% if t.notes %}<p class="small">{{ t.notes|truncatewords:20 }}</p>{% endif %}
+  </div>
+</a>

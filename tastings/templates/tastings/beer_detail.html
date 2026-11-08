@@ -1,0 +1,30 @@
+{% extends "tastings/base.html" %}
+{% block title %}{{ beer.name }}{% endblock %}
+{% block content %}
+<div class="beer-head">
+  <div>
+    <h1>{{ beer.name }}</h1>
+    <p class="muted">
+      <a href="{{ beer.brewery.get_absolute_url }}">{{ beer.brewery.name }}</a>
+      {% if beer.style %} · {{ beer.style }}{% endif %}
+      {% if beer.abv is not None %} · {{ beer.abv }} % vol.{% endif %}
+      {% if beer.ibu is not None %} · {{ beer.ibu }} IBU{% endif %}
+    </p>
+  </div>
+  <div class="score">
+    {% if beer.avg_rating is not None %}
+      <span class="rating big">{{ beer.avg_rating|floatformat:1 }}<small>/10</small></span>
+      <div class="muted small">moyenne sur {{ beer.tasting_count }} dégustation{{ beer.tasting_count|pluralize }}</div>
+    {% endif %}
+  </div>
+</div>
+<a class="btn btn-primary" href="{% url 'tastings:tasting_create' %}?beer={{ beer.pk }}">Déguster cette bière</a>
+
+<h2>Toutes les dégustations</h2>
+<div class="grid">
+  {% for t in page %}{% include "tastings/_tasting_card.html" with hide_beer=True %}{% empty %}
+  <p class="muted">Pas encore de dégustation.</p>
+  {% endfor %}
+</div>
+{% include "tastings/_pagination.html" %}
+{% endblock %}

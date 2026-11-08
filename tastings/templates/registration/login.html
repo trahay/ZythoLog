@@ -1,0 +1,15 @@
+{% extends "tastings/base.html" %}
+{% block title %}Connexion{% endblock %}
+{% block content %}
+<div class="narrow">
+<h1>Connexion</h1>
+<form method="post">{% csrf_token %}
+  {% if form.errors %}<div class="alert alert-error">Identifiant ou mot de passe incorrect.</div>{% endif %}
+  {% include "tastings/_field.html" with field=form.username %}
+  {% include "tastings/_field.html" with field=form.password %}
+  <input type="hidden" name="next" value="{{ next }}">
+  <button class="btn btn-primary" type="submit">Se connecter</button>
+</form>
+<p>Pas encore de compte ? <a href="{% url 'tastings:signup' %}">En créer un</a> (facultatif).</p>
+</div>
+{% endblock %}

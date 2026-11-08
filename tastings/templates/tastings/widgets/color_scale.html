@@ -1,0 +1,37 @@
+<div class="color-scale{% if widget.value is None %} unset{% endif %}">
+  <input type="hidden" name="{{ widget.name }}" value="{{ widget.value|default_if_none:'' }}">
+  <input type="range" id="{{ widget.attrs.id }}" min="{{ widget.min }}" max="{{ widget.max }}" step="1"
+         value="{{ widget.value|default:20 }}" style="background: {{ widget.gradient }}"
+         aria-label="Couleur sur l'échelle EBC">
+  <div class="color-scale-info">
+    <span class="color-chip" style="background: {{ widget.hex|default:'transparent' }}"></span>
+    <output>{% if widget.label %}{{ widget.label }} · {{ widget.value }} EBC{% else %}Non renseignée — faites glisser le curseur{% endif %}</output>
+    <button type="button" class="link color-clear">effacer</button>
+  </div>
+  {{ widget.srm_hex|json_script:"srm-hex" }}
+  {{ widget.labels|json_script:"ebc-labels" }}
+</div>
+<script>
+(function () {
+  const box = document.currentScript.previousElementSibling;
+  const [hidden, range] = box.querySelectorAll("input");
+  const chip = box.querySelector(".color-chip"), out = box.querySelector("output");
+  const hex = JSON.parse(box.querySelector("#srm-hex").textContent);
+  const labels = JSON.parse(box.querySelector("#ebc-labels").textContent);
+  function update() {
+    const ebc = +range.value;
+    const srm = Math.min(Math.max(Math.round(ebc / 1.97), 1), hex.length);
+    hidden.value = ebc;
+    box.classList.remove("unset");
+    chip.style.background = hex[srm - 1];
+    out.textContent = labels.find(([max]) => ebc <= max)[1] + " · " + ebc + " EBC";
+  }
+  range.addEventListener("input", update);
+  box.querySelector(".color-clear").addEventListener("click", () => {
+    hidden.value = "";
+    box.classList.add("unset");
+    chip.style.background = "transparent";
+    out.textContent = "Non renseignée — faites glisser le curseur";
+  });
+})();
+</script>

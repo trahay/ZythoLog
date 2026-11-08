@@ -1,0 +1,13 @@
+{% extends "tastings/base.html" %}
+{% block title %}Créer un compte{% endblock %}
+{% block content %}
+<div class="narrow">
+<h1>Créer un compte</h1>
+<p class="muted">Facultatif : un compte permet de retrouver toutes vos dégustations depuis n'importe quel appareil.
+  Les dégustations déjà faites depuis ce navigateur y seront rattachées.</p>
+<form method="post">{% csrf_token %}
+  {% for field in form %}{% include "tastings/_field.html" %}{% endfor %}
+  <button class="btn btn-primary" type="submit">Créer mon compte</button>
+</form>
+</div>
+{% endblock %}

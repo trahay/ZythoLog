@@ -1,0 +1,10 @@
+{% extends "tastings/base.html" %}
+{% block title %}Supprimer{% endblock %}
+{% block content %}
+<h1>Supprimer la dégustation ?</h1>
+<p>Dégustation de <strong>{{ t.beer.name }}</strong> du {{ t.date|date:"d/m/Y" }}. Cette action est définitive (photos comprises).</p>
+<form method="post">{% csrf_token %}
+  <button class="btn btn-danger" type="submit">Oui, supprimer</button>
+  <a class="btn" href="{{ t.get_absolute_url }}">Annuler</a>
+</form>
+{% endblock %}

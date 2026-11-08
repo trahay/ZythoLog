@@ -1,0 +1,93 @@
+{% extends "tastings/base.html" %}
+{% block title %}{{ t.beer.name }} – {{ t.date|date:"d/m/Y" }}{% endblock %}
+{% block content %}
+<div class="beer-head">
+  <div>
+    <h1><a href="{{ t.beer.get_absolute_url }}">{{ t.beer.name }}</a></h1>
+    <p class="muted">
+      <a href="{{ t.beer.brewery.get_absolute_url }}">{{ t.beer.brewery.name }}</a>
+      {% if t.beer.style %} · {{ t.beer.style }}{% endif %}
+      {% if t.beer.abv is not None %} · {{ t.beer.abv }} % vol.{% endif %}
+      {% if t.beer.ibu is not None %} · {{ t.beer.ibu }} IBU{% endif %}
+    </p>
+    <p class="small">Dégustée le {{ t.date|date:"j F Y" }} par <strong>{{ t.author_display }}</strong>
+      {% if t.serving %} · {{ t.get_serving_display }}{% endif %}{% if t.place %} · {{ t.place }}{% endif %}</p>
+  </div>
+  <div class="score"><span class="rating big">{{ t.rating|floatformat:"-1" }}<small>/10</small></span></div>
+</div>
+
+{% if can_edit %}
+<div class="actions">
+  <a class="btn" href="{% url 'tastings:tasting_edit' t.pk %}">Modifier</a>
+  <a class="btn btn-danger" href="{% url 'tastings:tasting_delete' t.pk %}">Supprimer</a>
+</div>
+{% endif %}
+{% if show_secret_link %}
+<div class="alert alert-info">
+  <strong>Lien secret</strong> (ne le partagez pas) — il permet de retrouver et modifier cette dégustation
+  depuis n'importe quel navigateur :<br>
+  <code class="secret">{{ request.scheme }}://{{ request.get_host }}{% url 'tastings:tasting_claim' t.edit_token %}</code><br>
+  <span class="small">Ou <a href="{% url 'tastings:signup' %}">créez un compte</a> : vos dégustations y seront automatiquement rattachées.</span>
+</div>
+{% endif %}
+
+{% if t.photos.all %}
+<div class="photos">
+  {% for p in t.photos.all %}<a href="{{ p.image.url }}" target="_blank"><img src="{{ p.image.url }}" alt="Photo {{ forloop.counter }}"></a>{% endfor %}
+</div>
+{% endif %}
+
+<div class="sheet">
+  <section class="panel">
+    <h2>👁 Apparence</h2>
+    <dl>
+      {% if t.color_ebc is not None %}<dt>Couleur</dt><dd><span class="swatch" style="background: {{ t.color_hex }}"></span>{{ t.color_label }} <span class="muted">({{ t.color_ebc }} EBC)</span></dd>{% endif %}
+      {% if t.clarity %}<dt>Transparence</dt><dd>{{ t.get_clarity_display }}</dd>{% endif %}
+      {% if t.head_color %}<dt>Couleur de la mousse</dt><dd>{{ t.get_head_color_display }}</dd>{% endif %}
+      {% if t.head_texture %}<dt>Texture de la mousse</dt><dd>{{ t.get_head_texture_display }}</dd>{% endif %}
+      {% if t.head_retention is not None %}<dt>Ténacité de la mousse</dt><dd>{{ t.get_head_retention_display }}</dd>{% endif %}
+    </dl>
+    {% if t.appearance_notes %}<p>{{ t.appearance_notes|linebreaksbr }}</p>{% endif %}
+  </section>
+
+  <section class="panel">
+    <h2>👃 Arômes</h2>
+    {% include "tastings/_profile.html" with profile=t.aroma_profile %}
+    {% if t.aroma_descriptors %}<p class="tags">{% for d in t.aroma_descriptor_labels %}<span class="tag">{{ d }}</span>{% endfor %}</p>{% endif %}
+    {% if t.aroma_notes %}<p>{{ t.aroma_notes|linebreaksbr }}</p>{% endif %}
+  </section>
+
+  <section class="panel">
+    <h2>👅 Saveurs</h2>
+    {% include "tastings/_profile.html" with profile=t.flavor_profile %}
+    {% if t.finish %}<p class="small">Longueur en bouche : <strong>{{ t.get_finish_display }}</strong></p>{% endif %}
+    {% if t.flavor_descriptors %}<p class="tags">{% for d in t.flavor_descriptor_labels %}<span class="tag">{{ d }}</span>{% endfor %}</p>{% endif %}
+    {% if t.flavor_notes %}<p>{{ t.flavor_notes|linebreaksbr }}</p>{% endif %}
+  </section>
+
+  <section class="panel">
+    <h2>✋ Sensation en bouche</h2>
+    <dl>
+      {% if t.body %}<dt>Corps</dt><dd>{{ t.get_body_display }}</dd>{% endif %}
+      {% if t.carbonation %}<dt>Carbonatation</dt><dd>{{ t.get_carbonation_display }}</dd>{% endif %}
+      <dt>Chaleur alcoolique</dt><dd>{{ t.alcohol_warmth }}/5</dd>
+      <dt>Astringence</dt><dd>{{ t.astringency }}/5</dd>
+    </dl>
+    {% if t.mouthfeel_notes %}<p>{{ t.mouthfeel_notes|linebreaksbr }}</p>{% endif %}
+  </section>
+</div>
+
+{% if t.off_flavors %}
+<section class="panel warn">
+  <h2>⚠ Faux-goûts relevés</h2>
+  <p class="tags">{% for d in t.off_flavor_labels %}<span class="tag">{{ d }}</span>{% endfor %}</p>
+</section>
+{% endif %}
+
+{% if t.notes %}
+<section class="panel">
+  <h2>📝 Notes de dégustation</h2>
+  <p>{{ t.notes|linebreaksbr }}</p>
+</section>
+{% endif %}
+{% endblock %}

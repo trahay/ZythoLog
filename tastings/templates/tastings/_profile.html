@@ -1,0 +1,9 @@
+<div class="profile">
+{% for label, value in profile %}
+  <div class="bar-row">
+    <span class="bar-label">{{ label }}</span>
+    <span class="bar"><span class="bar-fill v{{ value }}"></span></span>
+    <span class="bar-value">{{ value }}/5</span>
+  </div>
+{% endfor %}
+</div>

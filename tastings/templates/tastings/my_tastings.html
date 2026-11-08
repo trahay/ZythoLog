@@ -1,0 +1,16 @@
+{% extends "tastings/base.html" %}
+{% block title %}Mes dégustations{% endblock %}
+{% block content %}
+<h1>Mes dégustations</h1>
+{% if not user.is_authenticated %}
+  <p class="alert alert-info">Sans compte, seules les dégustations faites depuis ce navigateur apparaissent ici.
+    <a href="{% url 'tastings:signup' %}">Créez un compte</a> ou <a href="{% url 'login' %}">connectez-vous</a>
+    pour les rattacher à votre compte et les retrouver partout.</p>
+{% endif %}
+<div class="grid">
+  {% for t in page %}{% include "tastings/_tasting_card.html" %}{% empty %}
+  <p class="muted">Aucune dégustation. <a href="{% url 'tastings:tasting_create' %}">Noter une bière</a></p>
+  {% endfor %}
+</div>
+{% include "tastings/_pagination.html" %}
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "tastings/base.html" %}
+{% block content %}
+<section class="hero">
+  <h1>Votre carnet de dégustation de bières</h1>
+  <p>Notez l'apparence, les arômes, les saveurs et la sensation en bouche de chaque bière.
+     Pas besoin de compte pour commencer.</p>
+  <form method="get" action="{% url 'tastings:beer_list' %}" class="search">
+    {{ search_form.q }} <button class="btn" type="submit">Rechercher</button>
+  </form>
+  <a class="btn btn-primary" href="{% url 'tastings:tasting_create' %}">Noter une bière</a>
+</section>
+
+{% if top_beers %}
+<h2>Les mieux notées</h2>
+<table class="table">
+  <thead><tr><th>Bière</th><th>Brasserie</th><th>Style</th><th>Moyenne</th><th>Dégustations</th></tr></thead>
+  <tbody>
+  {% for b in top_beers %}
+    <tr><td><a href="{{ b.get_absolute_url }}">{{ b.name }}</a></td><td>{{ b.brewery.name }}</td>
+        <td>{{ b.style }}</td><td>{{ b.avg_rating|floatformat:1 }}/10</td><td>{{ b.tasting_count }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+<h2>Dernières dégustations</h2>
+<div class="grid">
+  {% for t in recent %}{% include "tastings/_tasting_card.html" %}{% empty %}
+  <p class="muted">Aucune dégustation pour l'instant. Soyez la première ou le premier !</p>
+  {% endfor %}
+</div>
+{% endblock %}

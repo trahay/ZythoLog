@@ -1,0 +1,36 @@
+{% load static %}<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Carnet de dégustation{% endblock %} · ZythoLog</title>
+  <link rel="stylesheet" href="{% static 'tastings/style.css' %}">
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="{% url 'tastings:home' %}">🍺 ZythoLog</a>
+    <nav>
+      <a href="{% url 'tastings:beer_list' %}">Bières</a>
+      <a href="{% url 'tastings:my_tastings' %}">Mes dégustations</a>
+      <a class="btn btn-small" href="{% url 'tastings:tasting_create' %}">+ Nouvelle dégustation</a>
+      {% if user.is_authenticated %}
+        <form method="post" action="{% url 'logout' %}" class="inline">{% csrf_token %}
+          <button type="submit" class="link">Déconnexion ({{ user.username }})</button>
+        </form>
+      {% else %}
+        <a href="{% url 'login' %}">Connexion</a>
+        <a href="{% url 'tastings:signup' %}">Créer un compte</a>
+      {% endif %}
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+  {% endfor %}
+  {% block content %}{% endblock %}
+</main>
+<footer class="wrap muted">Carnet de dégustation de bières — à consommer avec modération.</footer>
+</body>
+</html>
