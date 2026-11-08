@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 import os
+import sys
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -152,6 +153,14 @@ USE_TZ = True
 # par exemple /zytholog/static/ quand l'appli est servie sous /zytholog.
 STATIC_URL = 'static/'
 STATIC_ROOT = Path(os.environ.get('DJANGO_STATIC_ROOT', BASE_DIR / 'staticfiles'))
+
+# En production, les fichiers statiques portent un hash dans leur nom
+# (style.3f2a….css) : chaque déploiement est vu tout de suite par les navigateurs.
+if not DEBUG and "test" not in sys.argv:
+    STORAGES = {
+        "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+        "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"},
+    }
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
