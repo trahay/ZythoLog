@@ -17,7 +17,7 @@
   <tbody>
   {% for b in top_beers %}
     <tr><td><a href="{{ b.get_absolute_url }}">{{ b.name }}</a></td><td>{{ b.brewery.name }}</td>
-        <td>{% if b.style %}<a href="{% url 'tastings:beer_list' %}?style={{ b.style|urlencode }}">{{ b.style }}</a>{% endif %}</td><td>{{ b.avg_rating|floatformat:1 }}/10</td><td>{{ b.tasting_count }}</td></tr>
+        <td>{% if b.style %}<a href="{% url 'tastings:beer_list' %}?style={{ b.style|urlencode }}">{{ b.style }}</a>{% endif %}</td><td>{{ b.avg_rating|floatformat:1 }}/5</td><td>{{ b.tasting_count }}</td></tr>
   {% endfor %}
   </tbody>
 </table>

@@ -60,7 +60,6 @@ textarea { width: 100%; }
 .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 4px 16px 12px; margin-top: 16px; }
 .sheet .panel { margin-top: 0; }
 .panel h2 { font-size: 1.1em; }
-.panel.warn { border-color: var(--danger); }
 dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 0; }
 dt { color: var(--muted); } dd { margin: 0; }
 .swatch { display: inline-block; width: 14px; height: 14px; border-radius: 50%; margin-right: 6px; vertical-align: -2px; border: 1px solid var(--border); }
@@ -82,11 +81,9 @@ legend { font-weight: 700; padding: 0 6px; }
 .req { color: var(--danger); }
 .error { color: var(--danger); font-size: .88em; }
 .has-error input, .has-error select { border-color: var(--danger); }
-.field div:has(> div > label > input[type=radio]) { display: flex; flex-wrap: wrap; gap: 4px 16px; }
-.field label:has(input[type=radio]) { font-weight: normal; }
-.range-wrap { display: flex; align-items: center; gap: 8px; }
-.range-wrap input { flex: 1; accent-color: var(--accent); }
-.range-wrap output { width: 2.5em; color: var(--muted); }
+.field div:has(> div > label > input[type=radio]),
+.field-mouthfeel_sensations > div:has(> div > label > input[type=checkbox]) { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.field label:has(input[type=radio]), .field label:has(input[type=checkbox]) { font-weight: normal; }
 details { margin: 10px 0; } summary { cursor: pointer; font-weight: 600; }
 .descriptors > div { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px 16px; margin-top: 8px; }
 .descriptors > div > div > label { font-weight: 700; display: block; color: var(--muted); font-size: .9em; }

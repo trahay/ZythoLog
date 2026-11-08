@@ -21,20 +21,6 @@ class MultipleImageField(forms.ImageField):
         return [single(data, initial)] if data else []
 
 
-class RangeInput(forms.NumberInput):
-    input_type = "range"
-    template_name = "tastings/widgets/range.html"
-
-    def __init__(self, labels, attrs=None):
-        self.labels = labels
-        super().__init__(attrs={"min": 0, "max": 5, "step": 1, **(attrs or {})})
-
-    def get_context(self, name, value, attrs):
-        ctx = super().get_context(name, value, attrs)
-        ctx["widget"]["labels"] = self.labels
-        return ctx
-
-
 class ColorScaleInput(forms.Widget):
     """Curseur sur un dégradé de couleurs de bière (échelle EBC).
 
@@ -73,11 +59,6 @@ class ScaleInput(forms.Widget):
             label=labels.get(value, ""),
         )
         return ctx
-
-
-INTENSITY_FIELDS = [
-    "alcohol_warmth", "astringency",
-]
 
 
 BEER_FIELDS = ["beer_name", "brewery_name", "style", "abv", "ibu"]
@@ -135,8 +116,8 @@ class TastingForm(forms.ModelForm, BeerFieldsForm):
         label="Descripteurs de saveurs", choices=c.DESCRIPTORS, required=False,
         widget=forms.CheckboxSelectMultiple,
     )
-    off_flavors = forms.MultipleChoiceField(
-        label="Faux-goûts", choices=c.OFF_FLAVORS, required=False,
+    mouthfeel_sensations = forms.MultipleChoiceField(
+        label="Sensations", choices=c.MOUTHFEEL_SENSATIONS, required=False,
         widget=forms.CheckboxSelectMultiple,
     )
     photos = MultipleImageField(label="Photos", required=False)
@@ -146,7 +127,8 @@ class TastingForm(forms.ModelForm, BeerFieldsForm):
         exclude = ["beer", "user", "edit_token"]
         widgets = {
             "date": forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
-            "rating": forms.NumberInput(attrs={"min": 0, "max": 10, "step": 0.5}),
+            "rating": ScaleInput(c.PERSONAL_IMPRESSION, c.PERSONAL_IMPRESSION_TICKS, c.PERSONAL_IMPRESSION_GRADIENT),
+            "balance": ScaleInput(c.BALANCE, c.BALANCE_TICKS, c.BALANCE_GRADIENT),
             "color_ebc": ColorScaleInput,
             "aroma_intensity": ScaleInput(c.SCALE_INTENSITY, c.SCALE_INTENSITY_TICKS, c.SCALE_INTENSITY_GRADIENT),
             "aroma_impression": ScaleInput(c.SCALE_IMPRESSION, c.SCALE_IMPRESSION_TICKS, c.SCALE_IMPRESSION_GRADIENT),
@@ -154,8 +136,8 @@ class TastingForm(forms.ModelForm, BeerFieldsForm):
             "flavor_impression": ScaleInput(c.SCALE_IMPRESSION, c.SCALE_IMPRESSION_TICKS, c.SCALE_IMPRESSION_GRADIENT),
             "clarity": ScaleInput(c.CLARITY, c.CLARITY_TICKS, c.CLARITY_GRADIENT),
             "head_retention": ScaleInput(c.HEAD_RETENTION, c.HEAD_RETENTION_TICKS, c.HEAD_RETENTION_GRADIENT),
-            "body": forms.RadioSelect,
-            "carbonation": forms.RadioSelect,
+            "body": ScaleInput(c.BODY, c.BODY_TICKS, c.BODY_GRADIENT),
+            "carbonation": ScaleInput(c.CARBONATION, c.CARBONATION_TICKS, c.CARBONATION_GRADIENT),
             "finish": forms.RadioSelect,
             **{f: forms.Textarea(attrs={"rows": 2}) for f in [
                 "appearance_notes", "aroma_notes", "flavor_notes", "mouthfeel_notes"]},
@@ -169,11 +151,8 @@ class TastingForm(forms.ModelForm, BeerFieldsForm):
         if beer is not None:
             for name in BEER_FIELDS:
                 del self.fields[name]
-        for name in INTENSITY_FIELDS:
-            self.fields[name].widget = RangeInput(dict(c.INTENSITY))
-            self.fields[name].required = False  # 0 par défaut (voir clean)
         # Les RadioSelect générés par Django ajoutent un choix vide « --------- »
-        for name in ["body", "carbonation", "finish"]:
+        for name in ["finish"]:
             self.fields[name].choices = [ch for ch in self.fields[name].choices if ch[0] != ""]
         # Un utilisateur connecté signe avec son compte : pas besoin de pseudo
         if user is not None and user.is_authenticated:
@@ -183,13 +162,6 @@ class TastingForm(forms.ModelForm, BeerFieldsForm):
         if beer:
             self.initial.update(beer_name=beer.name, brewery_name=beer.brewery.name,
                                 style=beer.style, abv=beer.abv, ibu=beer.ibu)
-
-    def clean(self):
-        cleaned = super().clean()
-        for name in INTENSITY_FIELDS:
-            if cleaned.get(name) is None:
-                cleaned[name] = 0
-        return cleaned
 
     def save_beer(self):
         if self.fixed_beer is not None:

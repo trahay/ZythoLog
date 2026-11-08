@@ -26,8 +26,8 @@ def payload(**extra):
         "aroma_intensity": "4", "aroma_impression": "5",
         "aroma_descriptors": ["agrumes", "tropical"],
         "flavor_intensity": "4", "flavor_impression": "4", "flavor_descriptors": ["resineux"],
-        "body": "2", "carbonation": "4", "alcohol_warmth": "1", "astringency": "0",
-        "off_flavors": [], "rating": "7.5", "notes": "Très houblonnée.",
+        "body": "2", "carbonation": "4", "mouthfeel_sensations": ["cremeuse", "piquante"],
+        "rating": "4", "balance": "3", "notes": "Très houblonnée.",
     }
     data.update(extra)
     return data
@@ -65,12 +65,12 @@ class TastingTests(TestCase):
     def test_beer_reused_case_insensitive_and_listing(self):
         self.client.post(reverse("tastings:tasting_create"), payload())
         self.client.post(reverse("tastings:tasting_create"),
-                         payload(beer_name="punk ipa", brewery_name="brewdog", rating="9"))
+                         payload(beer_name="punk ipa", brewery_name="brewdog", rating="5"))
         self.assertEqual(Beer.objects.count(), 1)
         self.assertEqual(Brewery.objects.count(), 1)
         beer = Beer.objects.with_stats().get()
         self.assertEqual(beer.tasting_count, 2)
-        self.assertAlmostEqual(float(beer.avg_rating), 8.25)
+        self.assertAlmostEqual(float(beer.avg_rating), 4.5)
         r = self.client.get(reverse("tastings:beer_detail", args=[beer.pk]))
         self.assertEqual(len(r.context["page"]), 2)
         r = self.client.get(reverse("tastings:beer_list"), {"q": "brewdog"})
@@ -106,7 +106,7 @@ class TastingTests(TestCase):
         self.assertContains(r, '<option value="Vieux style maison" selected>')
 
     def test_rating_bounds(self):
-        r = self.client.post(reverse("tastings:tasting_create"), payload(rating="11"))
+        r = self.client.post(reverse("tastings:tasting_create"), payload(rating="6"))
         self.assertEqual(r.status_code, 200)
         self.assertFalse(Tasting.objects.exists())
 

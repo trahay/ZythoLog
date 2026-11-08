@@ -13,7 +13,8 @@
     <p class="small">Dégustée le {{ t.date|date:"j F Y" }} par <strong>{{ t.author_display }}</strong>
       {% if t.serving %} · {{ t.get_serving_display }}{% endif %}{% if t.place %} · {{ t.place }}{% endif %}</p>
   </div>
-  <div class="score"><span class="rating big">{{ t.rating|floatformat:"-1" }}<small>/10</small></span></div>
+  <div class="score"><span class="rating big">{{ t.rating }}<small>/5</small></span>
+    <div class="muted small">{{ t.get_rating_display }}{% if t.balance %} · {{ t.get_balance_display|lower }}{% endif %}</div></div>
 </div>
 
 {% if can_edit %}
@@ -70,19 +71,11 @@
     <dl>
       {% if t.body %}<dt>Corps</dt><dd>{{ t.get_body_display }}</dd>{% endif %}
       {% if t.carbonation %}<dt>Carbonatation</dt><dd>{{ t.get_carbonation_display }}</dd>{% endif %}
-      <dt>Chaleur alcoolique</dt><dd>{{ t.alcohol_warmth }}/5</dd>
-      <dt>Astringence</dt><dd>{{ t.astringency }}/5</dd>
     </dl>
+    {% if t.mouthfeel_sensations %}<p class="tags">{% for s in t.mouthfeel_sensation_labels %}<span class="tag">{{ s }}</span>{% endfor %}</p>{% endif %}
     {% if t.mouthfeel_notes %}<p>{{ t.mouthfeel_notes|linebreaksbr }}</p>{% endif %}
   </section>
 </div>
-
-{% if t.off_flavors %}
-<section class="panel warn">
-  <h2>⚠ Faux-goûts relevés</h2>
-  <p class="tags">{% for d in t.off_flavor_labels %}<span class="tag">{{ d }}</span>{% endfor %}</p>
-</section>
-{% endif %}
 
 {% if t.notes %}
 <section class="panel">

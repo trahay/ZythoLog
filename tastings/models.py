@@ -60,10 +60,6 @@ class Beer(models.Model):
         return reverse("tastings:beer_detail", args=[self.pk])
 
 
-def intensity(label):
-    return models.PositiveSmallIntegerField(label, choices=c.INTENSITY, default=0)
-
-
 class Tasting(models.Model):
     beer = models.ForeignKey(
         Beer, on_delete=models.CASCADE, related_name="tastings", verbose_name="bière"
@@ -120,15 +116,14 @@ class Tasting(models.Model):
     carbonation = models.PositiveSmallIntegerField(
         "carbonatation", choices=c.CARBONATION, null=True, blank=True
     )
-    alcohol_warmth = intensity("chaleur alcoolique")
-    astringency = intensity("astringence")
+    mouthfeel_sensations = models.JSONField("sensations", default=list, blank=True)
     mouthfeel_notes = models.TextField("remarques sur la sensation en bouche", blank=True)
 
-    off_flavors = models.JSONField("faux-goûts", default=list, blank=True)
 
-    rating = models.DecimalField(
-        "note /10", max_digits=3, decimal_places=1,
-        validators=[MinValueValidator(0), MaxValueValidator(10)],
+    # « rating » : impression personnelle de 1 (pas pour moi) à 5 (délicieuse)
+    rating = models.PositiveSmallIntegerField("impression personnelle", choices=c.PERSONAL_IMPRESSION)
+    balance = models.PositiveSmallIntegerField(
+        "ensemble et équilibre", choices=c.BALANCE, null=True, blank=True
     )
     notes = models.TextField("notes de dégustation", blank=True)
 
@@ -165,8 +160,9 @@ class Tasting(models.Model):
     def flavor_descriptor_labels(self):
         return [c.DESCRIPTOR_LABELS.get(k, k) for k in self.flavor_descriptors]
 
-    def off_flavor_labels(self):
-        return [c.OFF_FLAVOR_LABELS.get(k, k) for k in self.off_flavors]
+    def mouthfeel_sensation_labels(self):
+        return [c.MOUTHFEEL_SENSATION_LABELS.get(k, k) for k in self.mouthfeel_sensations]
+
 
     def aroma_profile(self):
         return [

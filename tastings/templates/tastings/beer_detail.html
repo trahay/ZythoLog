@@ -21,7 +21,7 @@
   </div>
   <div class="score">
     {% if beer.avg_rating is not None %}
-      <span class="rating big">{{ beer.avg_rating|floatformat:1 }}<small>/10</small></span>
+      <span class="rating big">{{ beer.avg_rating|floatformat:1 }}<small>/5</small></span>
       <div class="muted small">moyenne sur {{ beer.tasting_count }} dégustation{{ beer.tasting_count|pluralize }}</div>
     {% endif %}
   </div>

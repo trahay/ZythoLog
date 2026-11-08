@@ -82,23 +82,14 @@
     <legend>✋ Sensation en bouche</legend>
     {% include "tastings/_field.html" with field=form.body %}
     {% include "tastings/_field.html" with field=form.carbonation %}
-    <div class="cols">
-      {% include "tastings/_field.html" with field=form.alcohol_warmth %}
-      {% include "tastings/_field.html" with field=form.astringency %}
-    </div>
+    {% include "tastings/_field.html" with field=form.mouthfeel_sensations %}
     {% include "tastings/_field.html" with field=form.mouthfeel_notes %}
-  </fieldset>
-
-  <fieldset>
-    <legend>⚠ Faux-goûts</legend>
-    <details{% if form.off_flavors.value %} open{% endif %}><summary>Faux-goûts éventuels</summary>
-      <div class="descriptors">{{ form.off_flavors }}</div>
-    </details>
   </fieldset>
 
   <fieldset>
     <legend>⭐ Verdict</legend>
     {% include "tastings/_field.html" with field=form.rating %}
+    {% include "tastings/_field.html" with field=form.balance %}
     {% include "tastings/_field.html" with field=form.notes %}
     {% include "tastings/_field.html" with field=form.photos %}
     {% if tasting and tasting.photos.all %}

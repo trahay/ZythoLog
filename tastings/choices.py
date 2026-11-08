@@ -5,15 +5,6 @@ goût / toucher, descripteurs regroupés par origine, faux-goûts classés par
 cause).
 """
 
-INTENSITY = [
-    (0, "0 – absent"),
-    (1, "1 – très faible"),
-    (2, "2 – faible"),
-    (3, "3 – moyen"),
-    (4, "4 – fort"),
-    (5, "5 – très fort"),
-]
-
 # Arômes et saveurs : intensité et impression sur 5 points (curseurs)
 SCALE_INTENSITY = [
     (1, "Faible"),
@@ -144,6 +135,46 @@ CARBONATION = [
     (5, "Très élevée"),
 ]
 
+BODY_TICKS = ["Très léger", "Moyen", "Très plein"]
+BODY_GRADIENT = "linear-gradient(to right, #fbf3dc 0%, #e8c477 50%, #a9652a 100%)"
+CARBONATION_TICKS = ["Très faible", "Moyenne", "Très élevée"]
+CARBONATION_GRADIENT = "linear-gradient(to right, #efe9dc 0%, #bcd8e6 50%, #5fa3cc 100%)"
+
+# Sensations en bouche (cases à cocher)
+MOUTHFEEL_SENSATIONS = [
+    ("astringente", "Astringente"),
+    ("chauffante", "Chauffante"),
+    ("cremeuse", "Crémeuse"),
+    ("sirupeuse", "Sirupeuse"),
+    ("piquante", "Piquante"),
+    ("veloutee", "Veloutée"),
+    ("moelleuse", "Moelleuse"),
+    ("seche", "Sèche"),
+    ("surette", "Surette"),
+]
+MOUTHFEEL_SENSATION_LABELS = dict(MOUTHFEEL_SENSATIONS)
+
+# Verdict (curseurs sur 5 points)
+PERSONAL_IMPRESSION = [
+    (1, "Pas pour moi"),
+    (2, "Bof"),
+    (3, "Agréable"),
+    (4, "Très bonne"),
+    (5, "Délicieuse"),
+]
+PERSONAL_IMPRESSION_TICKS = ["Pas pour moi", "Agréable", "Délicieuse"]
+PERSONAL_IMPRESSION_GRADIENT = "linear-gradient(to right, #e6e0d2 0%, #f3d27a 50%, #e07b2c 100%)"
+
+BALANCE = [
+    (1, "Fade"),
+    (2, "Quelconque"),
+    (3, "Correct"),
+    (4, "Réussi"),
+    (5, "Remarquable"),
+]
+BALANCE_TICKS = ["Fade", "Correct", "Remarquable"]
+BALANCE_GRADIENT = "linear-gradient(to right, #e6e0d2 0%, #c9d6a3 50%, #6f9f4a 100%)"
+
 FINISH = [
     ("court", "Courte"),
     ("moyen", "Moyenne"),
@@ -202,30 +233,6 @@ DESCRIPTORS = [
         ("whisky", "Whisky / bourbon"),
         ("vin", "Vin"),
         ("coco", "Noix de coco"),
-    ]),
-]
-
-OFF_FLAVORS = [
-    ("Ingrédients", [
-        ("dms", "DMS (maïs cuit, légumes)"),
-        ("astringent", "Astringence (tanins)"),
-    ]),
-    ("Processus de brassage", [
-        ("diacetyle", "Diacétyle (beurre)"),
-        ("acetaldehyde", "Acétaldéhyde (pomme verte)"),
-        ("solvant", "Solvant / alcools supérieurs"),
-        ("autolyse", "Autolyse (levure, viande)"),
-    ]),
-    ("Infections microbiologiques", [
-        ("acetique", "Acétique (vinaigre)"),
-        ("phenolique", "Phénolique (médicinal, plastique)"),
-        ("aigre", "Aigre non voulu"),
-    ]),
-    ("Garde et conditionnement", [
-        ("oxydation", "Oxydation (carton, xérès)"),
-        ("lumiere", "Goût de lumière (skunky)"),
-        ("metallique", "Métallique"),
-        ("bouchon", "Bouchon / moisi"),
     ]),
 ]
 
@@ -299,4 +306,3 @@ def flatten(grouped):
 
 
 DESCRIPTOR_LABELS = flatten(DESCRIPTORS)
-OFF_FLAVOR_LABELS = flatten(OFF_FLAVORS)

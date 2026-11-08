@@ -15,7 +15,7 @@
       <td><a href="{{ b.brewery.get_absolute_url }}">{{ b.brewery.name }}</a></td>
       <td>{% if b.style %}<a href="{% url 'tastings:beer_list' %}?style={{ b.style|urlencode }}">{{ b.style }}</a>{% endif %}</td>
       <td>{% if b.abv is not None %}{{ b.abv }} %{% endif %}</td>
-      <td>{% if b.avg_rating is not None %}{{ b.avg_rating|floatformat:1 }}/10{% else %}–{% endif %}</td>
+      <td>{% if b.avg_rating is not None %}{{ b.avg_rating|floatformat:1 }}/5{% else %}–{% endif %}</td>
       <td>{{ b.tasting_count }}</td>
     </tr>
   {% empty %}
