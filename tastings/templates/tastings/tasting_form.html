@@ -1,4 +1,5 @@
 {% extends "tastings/base.html" %}
+{% load static %}
 {% block title %}{% if tasting %}Modifier la dégustation{% else %}Nouvelle dégustation{% endif %}{% endblock %}
 {% block content %}
 <h1>{% if tasting %}Modifier la dégustation{% else %}Nouvelle dégustation{% endif %}</h1>
@@ -112,4 +113,5 @@
   document.getElementById("id_brewery_name")?.setAttribute("list", "dl-breweries");
   document.getElementById("id_beer_name")?.setAttribute("list", "dl-beers");
 </script>
+<script src="{% static 'tastings/photo_compress.js' %}"></script>
 {% endblock %}
